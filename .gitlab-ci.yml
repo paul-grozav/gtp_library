@@ -11,3 +11,4 @@ build:
     - cd build
     - cmake ../cpp
     - make
+    - ./gtp_cpp_unit_tests

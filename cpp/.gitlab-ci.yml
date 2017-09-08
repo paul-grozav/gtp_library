@@ -1,0 +1,10 @@
+build:
+  script:
+    - date
+    - pwd
+    - whoami
+    - ls -l
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make

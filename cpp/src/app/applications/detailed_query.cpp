@@ -178,7 +178,7 @@ int main_detailed_query(::std::vector< ::std::string > arguments)
 
   return EXIT_SUCCESS;
 }
-REGISTER_SUB_PROGRAM(example_detailed_query, &main_detailed_query)
+//REGISTER_SUB_PROGRAM(example_detailed_query, &main_detailed_query)
 }
   // namespace applications
 } // namespace app

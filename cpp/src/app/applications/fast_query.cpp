@@ -31,7 +31,7 @@ int main_fast_query(::std::vector< ::std::string > arguments)
   cout << endl << "NOW is = " << rs2.fetch_row()[0] << endl;
   return EXIT_SUCCESS;
 }
-REGISTER_SUB_PROGRAM(example_fast_query, &main_fast_query)
+//REGISTER_SUB_PROGRAM(example_fast_query, &main_fast_query)
 }
  // namespace applications
 }// namespace app

@@ -200,6 +200,92 @@ endif ((NOT DEFINED depend_gtest_include_path) OR
   (NOT DEFINED depend_gtest_library_path))
 # ============================ END Google Test =============================== #
 
+# =============================== Boost ASIO ================================= #
+# If don't exist defines depend_boost_include_path
+# Boost_asio is header only
+if ((NOT DEFINED depend_boost_include_path) OR
+  (NOT DEFINED depend_boost_system_library_path))
+  message(STATUS "No Boost dependency paths were given. "
+    "Will download dependency.")
+
+  # don't include header only libs like asio
+  list(APPEND boost_required_components system)
+  join("${boost_required_components}" ";--with-" boost_build_components)
+  set(boost_build_components "--with-${boost_build_components}")
+  separate_arguments(boost_required_components)
+  message(STATUS "boost_build_components=${boost_build_components}")
+
+  if (${WIN32})
+    # More on lib naming on windows:
+    # http://www.boost.org/doc/libs/1_61_0/more/getting_started/windows.html
+    set(ep_boost_bootstrap "bootstrap.bat")
+    set(ep_boost_b2 "b2")
+    set(ep_boost_lib_ext "-vc140-mt-s-1_64.lib")
+    set(ep_boost_arch "32")
+  else (${WIN32})
+    set(ep_boost_bootstrap "./bootstrap.sh")
+    set(ep_boost_b2 "./b2")
+    set(ep_boost_lib_ext ".a")
+    set(ep_boost_arch "64")
+  endif (${WIN32})
+  ExternalProject_Add(boost
+    URL               "https://dl.bintray.com/boostorg/release/\
+1.66.0/source/boost_1_66_0.tar.gz"
+#    URL_MD5
+    BINARY_DIR         ${external_projects_base_dir}/Source/boost
+    INSTALL_DIR        ${external_projects_base_dir}/Install/boost
+    CONFIGURE_COMMAND  "" # No config - header only
+    CONFIGURE_COMMAND  ${ep_boost_bootstrap}
+    BUILD_COMMAND      ${ep_boost_b2} -j2 ${boost_build_components}
+                       link=static runtime-link=static variant=release
+                       architecture=x86 address-model=${ep_boost_arch}
+                       --abbreviate-paths
+    INSTALL_COMMAND    ${ep_boost_b2} install -j2 ${boost_build_components}
+                       link=static runtime-link=static variant=release
+                       architecture=x86 address-model=${ep_boost_arch}
+                       --abbreviate-paths
+                       --prefix=${external_projects_base_dir}/Install/boost
+    UPDATE_COMMAND     "" # Do not run update command
+    LOG_DOWNLOAD       ON
+    LOG_CONFIGURE      ON
+    LOG_BUILD          ON
+    LOG_INSTALL        ON
+  )
+  ExternalProject_Get_Property(boost install_dir)
+
+  set(ep_boost_install_dir "${install_dir}")
+  # Not sure why, on windows, it creates another folder with version in include
+  if (${WIN32})
+    set(depend_boost_include_path "${ep_boost_install_dir}/include/\
+boost-1_66")
+  else (${WIN32})
+    set(depend_boost_include_path ${ep_boost_install_dir}/include)
+  endif (${WIN32})
+  set(depend_boost_system_library_path
+    ${ep_boost_install_dir}/lib/libboost_system${ep_boost_lib_ext})
+
+  message(STATUS "Boost dependency will be used from:")
+  message(STATUS "boost include path: ${depend_boost_include_path}")
+  message(STATUS "boost_system library path:"
+    "${depend_boost_system_library_path}")
+
+  unset(boost_required_components)
+  unset(ep_boost_asio_bootstrap)
+  unset(ep_boost_asio_b2)
+  unset(ep_boost_asio_lib_ext)
+  unset(ep_boost_asio_arch)
+  unset(install_dir)
+  unset(ep_boost_install_dir)
+else ((NOT DEFINED depend_boost_include_path) OR
+  (NOT DEFINED depend_boost_system_library_path))
+  message(STATUS "Boost dependency paths are set. Using:")
+  message(STATUS "boost include path: ${depend_boost_asio_include_path}")
+  message(STATUS "boost_system library path:"
+    "${depend_boost_system_library_path}")
+endif ((NOT DEFINED depend_boost_include_path) OR
+ (NOT DEFINED depend_boost_system_library_path))
+# ============================= END Boost ASIO =============================== #
+
 # ================================ PThread =================================== #
 if (${WIN32})
   set( depend_pthread_library "" )
@@ -223,6 +309,7 @@ endif (${WIN32})
 include_directories(
   ${depend_mysql_include_path}
   ${depend_gtest_include_path}
+  ${depend_boost_include_path}
 )
 
 # ============================================================================ #
@@ -233,9 +320,9 @@ add_executable(${PROJECT_NAME}_unit_tests
   ${source_directory}/main_unit_tests.cpp
   ${source_directory}/app/tests/example.cpp
 )
-#add_dependencies( ${PROJECT_NAME}_unit_tests
-#  gtest
-#)
+add_dependencies( ${PROJECT_NAME}_unit_tests
+  gtest
+)
 target_link_libraries(${PROJECT_NAME}_unit_tests
   ${PROJECT_NAME} # Project GTP library
   ${depend_gtest_library_path} # Google Testing & Mocking Framework
@@ -252,14 +339,17 @@ add_executable(${PROJECT_NAME}_app
   # Sub programs
   ${source_directory}/app/applications/fast_query.cpp
   ${source_directory}/app/applications/detailed_query.cpp
+  ${source_directory}/app/applications/real_socket_test.cpp
 )
-#add_dependencies(${PROJECT_NAME}_app
-#  mysql
-#)
+add_dependencies(${PROJECT_NAME}_app
+  mysql
+  boost
+)
 target_link_libraries(${PROJECT_NAME}_app
   ${PROJECT_NAME} # Project GTP library
   ${depend_mysql_library_path} # MySQL C Connector
   ${depend_pthread_library} # PThread required for gtest
   ${depend_dynamic_library} # "Dynamic Library" library
+  ${depend_boost_system_library_path} # Boost system for sockets
 )
 # ============================================================================ #

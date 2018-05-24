@@ -26,7 +26,8 @@ echo -n "Process status: " &&
 ps -p $pid -o stat | tail -n1 &&
 
 echo -n "Process owner user: " &&
-echo $(ps -p $pid -o euser | tail -n1)"("$(ps -p $pid -o euid | tail -n1)")" &&
+echo $(ps -p $pid -o euser | tail -n1)"("$(ps -p $pid -o euid | tail -n1 |
+  cut -c 2-)")" &&
 
 echo -n "Process start time: " &&
 date --date "$(ps -p $pid -o lstart | tail -n1)" +"%Y-%m-%d %H:%M:%S" &&

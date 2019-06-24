@@ -19,7 +19,7 @@ struct ClientSocket {
     int connectionFileDescriptor;
 };
 
-typedef int (*PointerToClientHandlerFunction)(ClientSocket);
+typedef int (*PointerToClientHandlerFunction)(struct ClientSocket);
 
 char* portToCharArray(int port)
 {
@@ -35,7 +35,7 @@ char* portToCharArray(int port)
 void ServerSocketSignalChildHandler(int s)
 {
     while (waitpid(-1, NULL, WNOHANG) > 0)
-        ;
+    {}
 }
 
 void server(int port, int *socket_file_descriptor)
@@ -170,16 +170,52 @@ int clientHandler(struct ClientSocket clientSocket)
 // Receiving message
     char buffer[1024];
     printf("Waiting for message from client ...");
-    if (recv(clientSocket.connectionFileDescriptor, &buffer, sizeof(buffer), 0)
-        == -1)
+    int bytes_got = recv(clientSocket.connectionFileDescriptor, &buffer, sizeof(buffer), 0);
+    if (bytes_got == -1)
         perror("Can not read from the socket");
+    buffer[bytes_got-2] = 0; // remove \r\n or some two chars
     printf(" Client said: \"%s\"\n", buffer);
+
+  // Computing response
+  char buf[100];
+  int i = 0;
+  printf("Opening pipe ...\n"); fflush(stdout);
+  char cmd[1024];
+  // cmd like: date +"%Y-%m-%d"
+  unsigned int offset = 0;
+  strcpy(cmd, "/bin/date +\"");
+  offset += strlen(cmd);
+  strncpy(cmd + offset, buffer, bytes_got-2);
+  offset += bytes_got -2;
+  strcpy(cmd + offset, "\"\0");
+  printf("Running cmd= %s ...\n", cmd); fflush(stdout);
+  FILE *p = popen(cmd, "r");
+  // script: (echo "BEGIN" ; sleep 2 ; echo "END")
+//   FILE *p = popen("bash ./my_program.sh", "r");
+  if (p != NULL )
+  {
+    printf("Pipe opened. Reading from it...\n"); fflush(stdout);
+    while (!feof(p) && (i < 99) )
+    {
+      fread(&buf[i++],1,1,p);
+    }
+    buf[i] = 0;
+    printf("\"%s\" (read %d characters, i=%d)\n",buf, strlen(buf), i);
+    printf("Closing pipe.\n"); fflush(stdout);
+    pclose(p);
+    // return 0;
+  }
+  else
+  {
+    printf("Error opening pipe.\n"); fflush(stdout);
+    // return -1;
+  }
 
 // Sending message
     char message[1034];
-    strcpy(message, "You said: ");
-    strcat(message, buffer);
-    printf("char* message = \"%s\"\n", message);
+    strcpy(message, "Response: ");
+    strcat(message, buf);
+    printf("char* message = \"%s\" (%d characters)\n", message, strlen(message));
     printf("Sending a message to the client ...");
 
     if (send(clientSocket.connectionFileDescriptor, message, strlen(message), 0)
@@ -188,7 +224,7 @@ int clientHandler(struct ClientSocket clientSocket)
     printf(" Message sent\n");
 
 // Closing the socket
-    printf("Disconnecting the client ...");
+    printf("Closing client socket ...");
     close(clientSocket.connectionFileDescriptor);
     printf(" Socket closed!\n");
     return 0;
@@ -198,66 +234,10 @@ int clientHandler(struct ClientSocket clientSocket)
 
 int main(int argc, char* argv[])
 {
-    // Run program
-    printf("Forking\n"); fflush(stdout);
-    pid_t pid = fork();
-    printf("Got pid %d .\n", pid); fflush(stdout);
-    if(pid == 0){
-      // this is the child fork
-      printf("I AM CHILD.\n"); fflush(stdout);
-      char *args[] = {"/bin/bash", "/home/pgrozav/data/tmp/lg/srv_client/my_program.sh", NULL};
-      execvp("/bin/bash", args);
-      return 0;
-    }else{
-      printf("I AM PARENT.\n"); fflush(stdout);
-      // this is parent
-      if (pid < 0){
-        printf("Failed to create child process.\n"); fflush(stdout);
-        exit(1);
-      }
-      // if here, child was started
-      sleep(1);// second, allow the child to run for 1s
-      // then check it's status, and if running, kill it.
-      int should_run = 1;
-      while(should_run){
-        printf("parent_check_child.\n"); fflush(stdout);
-        int child_status = 0;
-        pid_t w = waitpid(pid, &child_status, WNOHANG);
-        if( w == -1 ){
-          printf("Failed to check for child process.\n"); fflush(stdout);
-          exit(1);
-        }else if( w == 0 ){
-          printf("Child process is still running.\n"); fflush(stdout);
-          should_run = 0;
-          int kill_result = kill(pid, SIGKILL); // Kill child
-          if(kill_result == 0)
-          {
-            printf("Signal sent.\n"); fflush(stdout);
-          }else{
-            printf("Error while sending signal.\n"); fflush(stdout);
-          }
-        }else{
-          printf("Unknown error while checking for child process.\n"); fflush(stdout);
-          exit(2);
-        }
-      }
-    }
-
-
-
-
-
-
-
-
-
-
-
-    return 0;
     int socket_file_descriptor = 0;
     server(1234, &socket_file_descriptor);
     printf("server: waiting for connections...\n");
     while (1)
-        acceptClient(socket_file_descriptor, &clientHandler);
+        acceptClient(&socket_file_descriptor, &clientHandler);
     return 0;
 }

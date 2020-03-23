@@ -29,6 +29,7 @@ namespace gtp
       ss << "]";
       return ss.str();
     };
+    str_to_u8_list = str_to_u8_list; // avoid warning "set but not used"
 // -------------------------------------------------------------------------- //
   }
 } // namespace gtp

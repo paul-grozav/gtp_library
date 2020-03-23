@@ -44,6 +44,7 @@ file(GLOB_RECURSE header_files
 add_custom_target(headers SOURCES ${header_files})
 
 list(APPEND cpp_files_common
+  ${source_directory}/gtp/debugging_utils.cpp
   ${source_directory}/gtp/db/interface/mysql_result_set.cpp
   ${source_directory}/gtp/db/interface/mysql_connection.cpp
 )

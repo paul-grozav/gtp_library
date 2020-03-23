@@ -175,8 +175,8 @@ if ((NOT DEFINED depend_gtest_include_path) OR
     ${ep_gtest_source_dir}/googlemock/include
   )
   list(APPEND depend_gtest_library_path
-    ${ep_gtest_binary_dir}/googlemock/gtest/${ep_gtest_library_name}
-    ${ep_gtest_binary_dir}/googlemock/${ep_gmock_library_name}
+    ${ep_gtest_binary_dir}/lib/${ep_gtest_library_name}
+    ${ep_gtest_binary_dir}/lib/${ep_gmock_library_name}
   )
   message(STATUS "Will use GTest & GMock paths:")
   join("${depend_gtest_include_path}" " , " depend_gtest_include_path_str)

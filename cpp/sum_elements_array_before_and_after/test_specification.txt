@@ -1,0 +1,9 @@
+Look into file:
+   src/unit_tests.c 
+In order to see the unit tests, the expectations.
+
+All expectations were met.
+
+I also tested the interface with the user (stdin, stdout, exit_code) to see
+that the application asks for input, prints the messages it should and at the
+end it will exit with the appropriate exit code(integer value).

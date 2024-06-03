@@ -1,0 +1,16 @@
+Look into file:
+   src/unit_tests.c 
+In order to see the unit tests, the expectations.
+
+All expectations were met.
+
+Beyond those tests I ran tests to test the bit_position value from main.c
+An integer (int datatype) uses 4 bytes, the equivalent of 4*8=32 bits.
+Considering the first bit at position 0, the last bit has the maximum
+position of 31. Therefore I tried to set the bit_position to 31 and expected
+that the program would accept that value. And also set it to 32 and expected
+that the program would reject the value. These expectations were also met.
+
+I also tested the interface with the user (stdin, stdout, exit_code) to see
+that the application asks for input, prints the messages it should and at the
+end it will exit with the appropriate exit code(integer value).

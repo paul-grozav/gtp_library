@@ -1,0 +1,35 @@
+# ============================================================================ #
+# Author: Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+# https://wiki.syslinux.org/wiki/index.php?title=Config
+# ============================================================================ #
+# NOTE: paths are relative to pxelinux.0
+
+default /pxe_syslinux/menu.c32
+
+# Do not show "boot:" prompt
+#prompt 0
+#prompt
+
+# timeout is in units of 1/10 s
+timeout 100
+
+# Which label to choose on timeout
+ontimeout tcl_http
+
+# Title will be centered
+# Only 60 characters long titles supported
+#menu title 123456789112345678921234567893123456789412345678951234567896
+#menu title ############################################################
+menu title PXE Boot Menu Tancredi-Paul Grozav Home LAN
+
+label tcl
+menu label ^1) Tiny Core Linux
+kernel /pxe_syslinux/memdisk
+append initrd=/tiny_core_linux.iso iso
+
+label tcl_http
+menu label ^1) Tiny Core Linux (HTTP)
+kernel /pxe_syslinux/memdisk
+append initrd=/aleph.iso iso
+# ============================================================================ #

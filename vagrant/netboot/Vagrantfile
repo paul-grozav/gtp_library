@@ -2,6 +2,19 @@
 # Authors:
 # - Tancredi-Paul Grozav <paul@grozav.info>
 # ============================================================================ #
+# vagrant up gateway
+# vagrant up Intel_x86PC__pxe_client
+# vagrant destroy -f Intel_x86PC__pxe_client
+# vagrant up EFI_IA32__pxe_client
+# vagrant destroy -f EFI_IA32__pxe_client
+# vagrant up EFI_x86-64__pxe_client
+# vagrant destroy -f EFI_x86-64__pxe_client
+# vagrant destroy -f gateway
+#
+# See also:
+# 1. https://fogproject.org/download
+# 2. https://www.iventoy.com/
+# ============================================================================ #
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 $network_address_prefix = '10.10.10'
@@ -17,6 +30,7 @@ Vagrant.configure("2") do |config|
   #     -o StrictHostKeyChecking=false -o UserKnownHostsFile=/dev/null \
   #     -i ./.vagrant/machines/gateway/virtualbox/private_key vagrant@127.0.0.1
   # $ ssh ...  sudo tcpdump -i eth1 -U -s0 -w - | sudo wireshark -k -i -
+  # $ sudo true ; vagrant ssh gateway -- /usr/bin/sudo tcpdump -i eth1 -U -s0 -w - | sudo wireshark -k -i -
   config.vm.define "gateway" do |config|
     config.vm.hostname = 'gateway'
     config.vm.box = "debian/bookworm64"
@@ -31,7 +45,8 @@ Vagrant.configure("2") do |config|
       ip: "192.168.10.2"
     # config.vm.provision :shell, path: "vms/gateway/fs/mnt/gateway.sh", args: [$network_address_prefix]
     # config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
-    config.vm.synced_folder "vms/gateway/fs/mnt", "/mnt"
+    config.vm.synced_folder "vms/gateway/fs/mnt", "/mnt", :mount_options => ["ro"],
+      owner: "root", group: "root"
     # config.vm.provision :shell, inline: "/bin/bash -c 'cp /mnt/gateway.sh /root/gateway.sh && bash /root/gateway.sh'", args: [$network_address_prefix]
     config.vm.provision :shell, inline: "/bin/bash /mnt/gateway.sh", args: [ $network_address_prefix ]
   end
@@ -51,7 +66,7 @@ Vagrant.configure("2") do |config|
 
   # Ensure you stop and start the VM (not restart it) - to ensure the PXELINUX
   # Is loading the kernel from HTTP
-  config.vm.define "pxe_client" do |config|
+  config.vm.define "Intel_x86PC__pxe_client" do |config|
     config.vm.box = "sridhav/empty"
     config.vm.network "private_network",
       mac: "080027000003",
@@ -59,10 +74,13 @@ Vagrant.configure("2") do |config|
       type: "static",
       ip: "192.168.10.3"
     config.vm.synced_folder '.', '/vagrant', disabled: true
+    #config.ssh.username="root"
+    config.ssh.connect_timeout = 1
     config.vm.provider :virtualbox do |vb|
       # Display the VirtualBox GUI when booting the machine
       vb.gui = true
       vb.check_guest_additions = false
+      # No shared folder
       vb.functional_vboxsf = false
       # https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifyvm.html
       # https://forums.fedoraforum.org/showthread.php?271743-Partitioning-errors-sda-must-have-a-gpt-disk-label&s=dbefdb7c0dfc762ebf765fe065ac889a&p=1525398#post1525398
@@ -77,6 +95,113 @@ Vagrant.configure("2") do |config|
       # Must be an Intel card (as-of VB 5.1 we cannot Intel PXE boot from a
       # virtio-net card).
       vb.customize ['modifyvm', :id, "--nictype2", '82540EM']
+
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor',    'your vendor name here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct',   'your product name here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion',   'your product version here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial',    'your product serial number here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU',       'your product SKU here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemUuid',      '00000000-0000-4000-8000-000000000001']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisVendor',   'your chassis vendor name here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisType',     '1']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisVersion',  'your chassis version here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisSerial',   'your chassis serial number here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisAssetTag', 'your chassis asset tag here']
+    end
+  end
+
+
+
+# ============================================================================ #
+
+
+  # Ensure you stop and start the VM (not restart it) - to ensure the PXELINUX
+  # Is loading the kernel from HTTP
+  config.vm.define "EFI_IA32__pxe_client" do |config|
+    config.vm.box = "sridhav/empty"
+    config.vm.network "private_network",
+      mac: "080027000004",
+      virtualbox__intnet: "isolated_net_1",
+      type: "static",
+      ip: "192.168.10.4"
+    config.vm.synced_folder '.', '/vagrant', disabled: true
+    #config.ssh.username="root"
+    config.ssh.connect_timeout = 1
+    config.vm.provider :virtualbox do |vb|
+      # Display the VirtualBox GUI when booting the machine
+      vb.gui = true
+      vb.check_guest_additions = false
+      # No shared folder
+      vb.functional_vboxsf = false
+      # https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifyvm.html
+      # https://forums.fedoraforum.org/showthread.php?271743-Partitioning-errors-sda-must-have-a-gpt-disk-label&s=dbefdb7c0dfc762ebf765fe065ac889a&p=1525398#post1525398
+      # https://www.redhat.com/sysadmin/pxe-boot-uefi
+      vb.customize ['modifyvm', :id, '--boot1', 'net']
+      #vb.customize ['modifyvm', :id, '--boot2', 'disk']
+      #vb.customize ['modifyvm', :id, '--biospxedebug', 'on']
+      vb.customize ['modifyvm', :id, '--cableconnected2', 'on']
+      # Ensure we boot from NIC 2 (vagrant LAN) with highest priority(1)
+      # For some reason it still boots from NIC1 first
+      vb.customize ['modifyvm', :id, '--nicbootprio2', '1']
+      # Must be an Intel card (as-of VB 5.1 we cannot Intel PXE boot from a
+      # virtio-net card).
+      vb.customize ['modifyvm', :id, "--nictype2", '82540EM']
+      # Specifies the firmware to be used to boot the VM: Available options are: BIOS, or one of the EFI options: efi, efi32, or efi64. Use EFI options with care.
+      vb.customize ['modifyvm', :id, "--firmware", "efi32"]
+
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor',    'your vendor name here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct',   'your product name here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemVersion',   'your product version here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemSerial',    'your product serial number here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemSKU',       'your product SKU here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemUuid',      '00000000-0000-4000-8000-000000000001']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisVendor',   'your chassis vendor name here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisType',     '1']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisVersion',  'your chassis version here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisSerial',   'your chassis serial number here']
+      # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiChassisAssetTag', 'your chassis asset tag here']
+    end
+  end
+
+
+
+# ============================================================================ #
+
+
+  # Ensure you stop and start the VM (not restart it) - to ensure the kernel is
+  # loaded through the network
+  # Enter boot manager and choose UEFI PXEv4 from the MAC ...0005
+  config.vm.define "EFI_x86-64__pxe_client" do |config|
+    config.vm.box = "sridhav/empty"
+    config.vm.network "private_network",
+      mac: "080027000005",
+      virtualbox__intnet: "isolated_net_1",
+      type: "static",
+      ip: "192.168.10.5"
+    config.vm.synced_folder '.', '/vagrant', disabled: true
+    #config.ssh.username="root"
+    config.ssh.connect_timeout = 1
+    config.vm.provider :virtualbox do |vb|
+      # Display the VirtualBox GUI when booting the machine
+      vb.gui = true
+      vb.check_guest_additions = false
+      # No shared folder
+      vb.functional_vboxsf = false
+      # https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifyvm.html
+      # https://forums.fedoraforum.org/showthread.php?271743-Partitioning-errors-sda-must-have-a-gpt-disk-label&s=dbefdb7c0dfc762ebf765fe065ac889a&p=1525398#post1525398
+      # https://www.redhat.com/sysadmin/pxe-boot-uefi
+      vb.customize ['modifyvm', :id, '--boot1', 'net']
+      #vb.customize ['modifyvm', :id, '--boot2', 'disk']
+      #vb.customize ['modifyvm', :id, '--biospxedebug', 'on']
+      vb.customize ['modifyvm', :id, '--cableconnected2', 'on']
+      # Ensure we boot from NIC 2 (vagrant LAN) with highest priority(1)
+      # For some reason it still boots from NIC1 first
+      vb.customize ['modifyvm', :id, '--nicbootprio2', '1']
+      # Must be an Intel card (as-of VB 5.1 we cannot Intel PXE boot from a
+      # virtio-net card).
+      vb.customize ['modifyvm', :id, "--nictype2", '82540EM']
+      # Specifies the firmware to be used to boot the VM: Available options are: BIOS, or one of the EFI options: efi, efi32, or efi64. Use EFI options with care.
+      vb.customize ['modifyvm', :id, "--firmware", "efi64"]
 
       # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemVendor',    'your vendor name here']
       # vb.customize ['setextradata', :id, 'VBoxInternal/Devices/pcbios/0/Config/DmiSystemProduct',   'your product name here']

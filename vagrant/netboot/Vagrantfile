@@ -47,8 +47,8 @@ Vagrant.configure("2") do |config|
     # config.vm.provision "file", source: "~/.gitconfig", destination: ".gitconfig"
     config.vm.synced_folder "vms/gateway/fs/mnt", "/mnt", :mount_options => ["ro"],
       owner: "root", group: "root"
-    # config.vm.provision :shell, inline: "/bin/bash -c 'cp /mnt/gateway.sh /root/gateway.sh && bash /root/gateway.sh'", args: [$network_address_prefix]
-    config.vm.provision :shell, inline: "/bin/bash /mnt/gateway.sh", args: [ $network_address_prefix ]
+    # config.vm.provision :shell, inline: "/bin/bash -c 'cp /mnt/start.sh /root/start.sh && bash /root/start.sh'", args: [$network_address_prefix]
+    config.vm.provision :shell, inline: "/bin/bash /mnt/start.sh", args: [ $network_address_prefix ]
   end
 
 # ============================================================================ #
@@ -66,6 +66,8 @@ Vagrant.configure("2") do |config|
 
   # Ensure you stop and start the VM (not restart it) - to ensure the PXELINUX
   # Is loading the kernel from HTTP
+  # Not clear if this is a 32-bit or 64-bit machine, but probably a 64-bit.
+  # Anyway, both should be able to boot the same pxelinux.0 binary
   config.vm.define "Intel_x86PC__pxe_client" do |config|
     config.vm.box = "sridhav/empty"
     config.vm.network "private_network",
@@ -117,6 +119,7 @@ Vagrant.configure("2") do |config|
 
   # Ensure you stop and start the VM (not restart it) - to ensure the PXELINUX
   # Is loading the kernel from HTTP
+  # EFI IA32 (32-bit EFI client)
   config.vm.define "EFI_IA32__pxe_client" do |config|
     config.vm.box = "sridhav/empty"
     config.vm.network "private_network",
@@ -171,6 +174,7 @@ Vagrant.configure("2") do |config|
   # Ensure you stop and start the VM (not restart it) - to ensure the kernel is
   # loaded through the network
   # Enter boot manager and choose UEFI PXEv4 from the MAC ...0005
+  # EFI x86-64 (64-bit EFI)
   config.vm.define "EFI_x86-64__pxe_client" do |config|
     config.vm.box = "sridhav/empty"
     config.vm.network "private_network",

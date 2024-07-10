@@ -13,10 +13,17 @@ set -x &&
 # Current directory, where the script exists
 current_directory="$(cd $(dirname $0); pwd)" &&
 
-syslinux_version="6.02" &&
+# 6.02 is last known good. 6.03 is last version released but introduced a bug
+# that affects us. The bug was fixed in 6.04-pre1
+#syslinux_version="6.02" &&
+#syslinux_version="6.03" &&
+syslinux_version="6.04-pre1" &&
 syslinux_folder="syslinux-${syslinux_version}" &&
 syslinux_url="https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux" &&
 syslinux_url="${syslinux_url}/${syslinux_folder}.tar.gz" &&
+
+syslinux_url="https://mirrors.edge.kernel.org/pub/linux/utils/boot/syslinux" &&
+syslinux_url="${syslinux_url}/Testing/6.04/syslinux-6.04-pre1.tar.gz" &&
 
 if [ ! -f ${current_directory}/${syslinux_folder}.tar.gz ]; then
   wget ${syslinux_url}
@@ -56,7 +63,11 @@ function Intel_x86PC__clients()
     --strip-components 5 \
     ${syslinux_folder}/bios/com32/elflink/ldlinux/ldlinux.c32 \
     &&
-  ln -s ${current_directory}/pxelinux.cfg ${destination} &&
+  # If this points to an absolute path, TFTP server will not be able to read it
+  # because it runs in a chroot jail. So, it needs to be relative.
+  # ln -s ${current_directory}/pxelinux.cfg ${destination} &&
+  ln -s $(realpath -s --relative-to=${destination} \
+    ${current_directory})/pxelinux.cfg ${destination} &&
 
   # /pxelinux.cfg/default will require /menu.c32 to display the boot menu
   # and /menu.c32 requires /libutil.c32 .
@@ -103,6 +114,11 @@ function EFI_IA32__clients()
     --strip-components 5 \
     ${syslinux_folder}/efi32/com32/elflink/ldlinux/ldlinux.e32 \
     &&
+  # If this points to an absolute path, TFTP server will not be able to read it
+  # because it runs in a chroot jail. So, it needs to be relative.
+  # ln -s ${current_directory}/pxelinux.cfg ${destination} &&
+  ln -s $(realpath -s --relative-to=${destination} \
+    ${current_directory})/pxelinux.cfg ${destination} &&
   true
 } && EFI_IA32__clients &&
 # ============================================================================ #
@@ -126,6 +142,11 @@ function EFI_x86-64__clients()
     --strip-components 5 \
     ${syslinux_folder}/efi64/com32/elflink/ldlinux/ldlinux.e64 \
     &&
+  # If this points to an absolute path, TFTP server will not be able to read it
+  # because it runs in a chroot jail. So, it needs to be relative.
+  # ln -s ${current_directory}/pxelinux.cfg ${destination} &&
+  ln -s $(realpath -s --relative-to=${destination} \
+    ${current_directory})/pxelinux.cfg ${destination} &&
   true
 } && EFI_x86-64__clients &&
 # ============================================================================ #

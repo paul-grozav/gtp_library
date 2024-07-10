@@ -26,7 +26,7 @@ iptables -A OUTPUT -j ACCEPT &&
 # Note: these settings will be lost after reboot. Read how to persist iptables
 # rules.
 
-# client transfer problems:
+# to avoid client transfer problems:
 #sysctl net.ipv4.tcp_wmem="4096 16384 3355232" &&
 sysctl net.ipv4.tcp_wmem="4096 16384 32768" &&
 sysctl net.ipv4.tcp_mem="4096 16384 32768" &&
@@ -37,9 +37,11 @@ export DEBIAN_FRONTEND=noninteractive &&
 apt-get update &&
 test="" &&
 # Only for debugging
-test="procps less nano rsyslog tftp-hpa curl net-tools tcpdump" &&
-apt-get install -y dnsmasq tftpd-hpa apache2 rpm2cpio ${test} &&
+test="procps less nano rsyslog tftp-hpa curl net-tools tcpdump nmap" &&
+apt-get install -y dnsmasq isc-dhcp-server tftpd-hpa apache2 rpm2cpio ${test} &&
 apt clean &&
+
+true ; exit 0 &&
 
 cp /mnt/get_binaries.sh /srv/tftp/ &&
 (
@@ -56,55 +58,90 @@ cp /mnt/get_binaries.sh /srv/tftp/ &&
 (
   cd /var/www/html &&
   cp /srv/tftp/tiny_core_linux.iso . &&
-  cp /srv/tftp/pxe_syslinux/memdisk . &&
+  #cp /srv/tftp/pxe_syslinux/memdisk . &&
   wget https://tancredi-paul-grozav.gitlab.io/aleph/distribution_content/aleph.krnl &&
   wget https://tancredi-paul-grozav.gitlab.io/aleph/distribution_content/aleph.ird &&
   wget https://tancredi-paul-grozav.gitlab.io/aleph/distribution_content/aleph.sfs &&
   cp -r /mnt/aleph_config . &&
+  mkdir EFI_IA32 && cd EFI_IA32 &&
+  wget https://ftp.debian.org/debian/dists/stable/main/installer-i386/current/images/hd-media/vmlinuz &&
+  wget https://ftp.debian.org/debian/dists/stable/main/installer-i386/current/images/hd-media/initrd.gz &&
+  cd .. &&
   true
 ) &&
 
-# start
 set -x &&
 #true ; exit 0 &&
-# Only start ipv4 dhcpd - with our cfg file
-# logs to /var/log/syslog
-# ensure this interface name's assigned IP settings, match the CIDR defined
-# in dhcpd.conf
-echo "INTERFACESv4=\"eth1\"" > /etc/default/isc-dhcp-server &&
-#echo "INTERFACESv4=\"br0 eth0\"" > /etc/default/isc-dhcp-server &&
-#rm -f /etc/dhcp/dhcpd.conf &&
-#cp /mnt/dhcpd.conf /etc/dhcp/dhcpd.conf &&
-#rm -f /var/run/dhcpd.pid &&
-cp /mnt/custom_dnsmasq.conf /etc/dnsmasq.d/ &&
 
-# TFTP server dir mapped to hypervisor
-# logs to /var/log/syslog
-#sed 's/^TFTP_OPTIONS="--secure"$/TFTP_OPTIONS="--secure -v -v -v"/g' \
-#  -i /etc/default/tftpd-hpa &&
-#rm -Rf /srv/tftp &&
-#ln -s /data/tftp /srv/tftp &&
+# service configuration files
+(
+  # Use isc-dhcp-server + tftpd-hpa
+  # exit 0 &&
+  # Only start ipv4 dhcpd - with our cfg file
+  # logs to /var/log/syslog
+  # ensure this interface name's assigned IP settings, match the CIDR defined
+  # in dhcpd.conf
+  echo "INTERFACESv4=\"eth1\"" > /etc/default/isc-dhcp-server &&
+  #echo "INTERFACESv4=\"br0 eth0\"" > /etc/default/isc-dhcp-server &&
+  rm -f /etc/dhcp/dhcpd.conf &&
+  cp /mnt/dhcpd.conf /etc/dhcp/dhcpd.conf &&
+  rm -f /var/run/dhcpd.pid &&
+
+  # TFTP server dir mapped to hypervisor
+  # logs to /var/log/syslog
+  sed 's/^TFTP_OPTIONS="--secure"$/TFTP_OPTIONS="--secure -v -v -v"/g' \
+    -i /etc/default/tftpd-hpa &&
+  true
+) &&
+(
+  # Use dnsmasq for both DHCP and TFTP
+  exit 0 &&
+  cp /mnt/custom_dnsmasq.conf /etc/dnsmasq.d/ &&
+  true
+) &&
 
 # HTTP server
 # logs to /var/log/nginx/*.log
 #rm -rf /var/www/html &&
 #ln -s /data/http /var/www/html &&
 
-systemctl disable isc-dhcp-server &&
-systemctl disable tftpd-hpa &&
+#systemctl disable isc-dhcp-server &&
+#systemctl disable tftpd-hpa &&
 
-#/sbin/rsyslogd &&
-#touch /var/log/syslog &&
-/etc/init.d/dnsmasq start &&
-#/etc/init.d/isc-dhcp-server start &&
-#/etc/init.d/isc-dhcp-server start ||
-#  [ "$(ls -la /proc/*/exe | grep dhcpd | wc -l)" == "1" ] &&
-#/etc/init.d/tftpd-hpa start &&
+
+
+# start services
+# Required for isc-dhcp-server and tftpd-hpa
+/sbin/rsyslogd &&
+touch /var/log/syslog &&
 #/etc/init.d/nginx start &&
 /etc/init.d/apache2 start &&
 #tail -f /var/log/{syslog,nginx/*.log} &&
+
+(
+  # Use isc-dhcp-server + tftpd-hpa
+  /etc/init.d/isc-dhcp-server start &&
+  #/etc/init.d/isc-dhcp-server start ||
+  #  [ "$(ls -la /proc/*/exe | grep dhcpd | wc -l)" == "1" ] &&
+  /etc/init.d/tftpd-hpa start &&
+  true
+) &&
+(
+  # Use dnsmasq for both DHCP and TFTP
+  exit 0 &&
+  /etc/init.d/dnsmasq start &&
+  true
+) &&
 # sleep infinity &&
 
+# Test servers:
+# sudo nmap -e eth1 --script broadcast-dhcp-discover --script-args \
+#   broadcast-dhcp-discover.mac=08:00:27:00:00:03,\
+# broadcast-dhcp-discover.timeout=1s
+# Maybe even tcpdump while dhcp-discover(to see more response details):
+# tcpdump -i eth1 -n -vvv
+# tftp 127.0.0.1 -m binary -c get syslinux/Intel_x86PC/lpxelinux.0
+# curl -vvv http:/127.0.0.1:80/tiny_core_linux.iso | head
 
 exit 0
 # ============================================================================ #

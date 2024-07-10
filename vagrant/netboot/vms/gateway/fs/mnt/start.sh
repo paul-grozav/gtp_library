@@ -41,7 +41,7 @@ test="procps less nano rsyslog tftp-hpa curl net-tools tcpdump nmap" &&
 apt-get install -y dnsmasq isc-dhcp-server tftpd-hpa apache2 rpm2cpio ${test} &&
 apt clean &&
 
-true ; exit 0 &&
+# true ; exit 0 &&
 
 cp /mnt/get_binaries.sh /srv/tftp/ &&
 (

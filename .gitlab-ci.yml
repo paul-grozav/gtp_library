@@ -7,8 +7,9 @@ build:
     - pwd
     - whoami
     - ls -l
+    - cd cpp/gtp_library
     - mkdir build
     - cd build
-    - cmake ../cpp
+    - cmake ..
     - make
     - ./gtp_cpp_unit_tests

@@ -74,6 +74,11 @@ set -x &&
 #true ; exit 0 &&
 
 # service configuration files
+# isc-dhcp is more clear in it's definition, works best for beginners or small
+# number of machines. dnsmasq is good at labeling and applying rules to many
+# machines(though they say it was not designed to be very scalable, works fine
+# for a relatively small number of machines). Also, note that ISC ended support
+# for dhcp, and now they develop Kea as a DHCP replacement implementation.
 (
   # Use isc-dhcp-server + tftpd-hpa
   # exit 0 &&

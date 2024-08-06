@@ -154,7 +154,7 @@ if ((NOT DEFINED depend_gtest_include_path) OR
     "Will download dependency.")
   ExternalProject_Add(gtest
     GIT_REPOSITORY    https://github.com/google/googletest.git
-    GIT_TAG           master
+    GIT_TAG           main
     SOURCE_DIR        ${dependencies_dir}/googletest-src
     BINARY_DIR        ${dependencies_dir}/googletest-build
     CMAKE_ARGS        -DCMAKE_BUILD_TYPE=Release

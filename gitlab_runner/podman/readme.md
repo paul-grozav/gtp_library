@@ -1,0 +1,1 @@
+we start a podman container, and start our entrypoint in it. Then this entrypoint starts the gitlab-runner binary and specifies the config.toml as a parameter. The config.toml instructs the runner on how to prepare, run and cleanup for each job - these are custom scripts that get executed to perform these operations, in this order, for each job.

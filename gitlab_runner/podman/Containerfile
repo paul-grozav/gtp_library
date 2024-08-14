@@ -2,8 +2,11 @@
 # Author(s):
 # - Tancredi-Paul Grozav <paul@grozav.info>
 # ============================================================================ #
-
-# Ignore all binaries
-bin/
-
+# The runner will run in a podman image, so that it can create a container for
+# every job it needs to run.
+from quay.io/podman/stable:v4.5.0
+# These tools are required by GitLab runner, when running jobs.
+run dnf install -y hostname git
+run dnf clean all
 # ============================================================================ #
+

@@ -1,0 +1,13 @@
+# ============================================================================ #
+# Author(s):
+# - Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+
+# Ignore all binaries
+fs/root/gitlab_runner/bin/
+
+# Ignore config.toml as this is auto-generated during runner registration
+fs/root/gitlab_runner/cfg/config.toml
+
+# ============================================================================ #
+

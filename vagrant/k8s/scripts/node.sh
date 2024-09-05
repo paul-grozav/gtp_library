@@ -10,7 +10,7 @@ env &&
 config_path="/vagrant/configs" &&
 
 echo "Joining the node to the cluster ..." &&
-/bin/bash -x ${config_path}/join.sh -v &&
+/bin/bash -x ${config_path}/join_worker.sh -v &&
 
 echo "Copying kubeconfig to vagrant's home folder ..." &&
 mkdir -p /home/vagrant/.kube &&

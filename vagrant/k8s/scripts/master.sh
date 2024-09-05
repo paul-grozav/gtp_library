@@ -13,12 +13,15 @@ kubeadm config images pull &&
 
 echo "Initializing control plane node ..." &&
 kubeadm init \
-  --apiserver-advertise-address=${CONTROL_IP} \
-  --apiserver-cert-extra-sans=${CONTROL_IP} \
-  --pod-network-cidr=${POD_CIDR} \
-  --service-cidr=${SERVICE_CIDR} \
+  --apiserver-advertise-address ${CONTROL_IP} \
+  --apiserver-cert-extra-sans ${CONTROL_IP} \
+  --pod-network-cidr ${POD_CIDR} \
+  --service-cidr ${SERVICE_CIDR} \
   --ignore-preflight-errors Swap \
+  --upload-certs \
+  --control-plane-endpoint ${CONTROL_IP}:6443 \
   &&
+  # --apiserver-count=3 \
   # --node-name $(hostname -s) \
 
 echo "Copying kubeconfig to root's home folder ..." &&
@@ -38,7 +41,14 @@ mkdir -p ${config_path} &&
 # delete it for saving new configuration.
 rm -f ${config_path}/* &&
 cp -i /etc/kubernetes/admin.conf ${config_path}/config &&
-kubeadm token create --print-join-command > ${config_path}/join.sh &&
+kubeadm token create --print-join-command > ${config_path}/join_worker.sh &&
+(
+  echo -n "$(cat ${config_path}/join_worker.sh)" &&
+  echo -n " --control-plane --certificate-key " &&
+  kubeadm init phase upload-certs --upload-certs |
+    grep -v "^\[upload-certs\] " &&
+  true
+) > ${config_path}/join_control_plane.sh &&
 
 echo "Installing Calico Network Plugin ..." &&
 #curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml -O &&

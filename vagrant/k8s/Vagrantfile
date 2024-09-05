@@ -2,8 +2,10 @@
 # Authors:
 # - Tancredi-Paul Grozav <paul@grozav.info>
 # ============================================================================ #
-# vagrant up node01
-# vagrant destroy -f node01
+# vagrant up control-plane
+# vagrant destroy -f control-plane
+# vagrant up node-1
+# vagrant destroy -f node-1
 # ============================================================================ #
 require "yaml"
 vagrant_root = File.dirname(File.expand_path(__FILE__))
@@ -18,11 +20,13 @@ NUM_WORKER_NODES = settings["nodes"]["workers"]["count"]
 
 Vagrant.configure("2") do |config|
   config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START, "NUM_WORKER_NODES" => NUM_WORKER_NODES }, inline: <<-SHELL
-      apt-get update -y
-      echo "$IP_NW$((IP_START)) controlplane" >> /etc/hosts
-      for i in `seq 1 ${NUM_WORKER_NODES}`; do
-        echo "$IP_NW$((IP_START+i)) node0${i}" >> /etc/hosts
-      done
+      set +x &&
+      echo "${IP_NW}${IP_START} control-plane" >> /etc/hosts &&
+      for i in `seq 1 ${NUM_WORKER_NODES}`
+      do
+        echo "${IP_NW}$((IP_START+i)) node-${i}" >> /etc/hosts
+      done &&
+      true
   SHELL
 
   if `uname -m`.strip == "aarch64"
@@ -33,8 +37,8 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = true
 
   # Create 1 Control plane VM
-  config.vm.define "controlplane" do |controlplane|
-    controlplane.vm.hostname = "controlplane"
+  config.vm.define "control-plane" do |controlplane|
+    controlplane.vm.hostname = "control-plane"
     controlplane.vm.network "private_network", ip: settings["network"]["control_ip"]
     if settings["shared_folders"]
       settings["shared_folders"].each do |shared_folder|
@@ -71,8 +75,8 @@ Vagrant.configure("2") do |config|
   # Create N worker nodes
   (1..NUM_WORKER_NODES).each do |i|
 
-    config.vm.define "node0#{i}" do |node|
-      node.vm.hostname = "node0#{i}"
+    config.vm.define "node-#{i}" do |node|
+      node.vm.hostname = "node-#{i}"
       node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
       if settings["shared_folders"]
         settings["shared_folders"].each do |shared_folder|

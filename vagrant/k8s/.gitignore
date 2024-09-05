@@ -4,4 +4,7 @@
 # ============================================================================ #
 # This is where Vagrant keeps it's things for the VMs it provisiones
 .vagrant
+
+# files generated for the new cluster
+configs
 # ============================================================================ #

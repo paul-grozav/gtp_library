@@ -4,7 +4,8 @@
 # ============================================================================ #
 # export KUBECONFIG=$(pwd)/configs/config
 # kubectl get nodes
-# while true; do kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard 29999:443; done
+# while true; do kubectl -n kubernetes-dashboard port-forward \
+#   svc/kubernetes-dashboard 29999:443; done
 #
 # Thanks to: https://github.com/techiescamp/vagrant-kubeadm-kubernetes/tree/main
 # ============================================================================ #

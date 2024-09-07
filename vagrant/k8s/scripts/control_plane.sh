@@ -11,16 +11,42 @@ env &&
 echo "Downloading K8s images ..." &&
 kubeadm config images pull &&
 
+local_ip="$(ip --json a s | jq -r ".[] |
+  if .ifname == \"eth1\"
+  then
+    .addr_info[] |
+      if .family == \"inet\"
+      then
+        .local
+      else
+        empty
+      end
+  else
+    empty
+  end"
+)" &&
+
 echo "Initializing control plane node ..." &&
 kubeadm init \
-  --apiserver-advertise-address ${CONTROL_IP} \
-  --apiserver-cert-extra-sans ${CONTROL_IP} \
-  --pod-network-cidr ${POD_CIDR} \
-  --service-cidr ${SERVICE_CIDR} \
+  --v 5 \
   --ignore-preflight-errors Swap \
   --upload-certs \
+  ` # This points to the LoadBalancer that balances between the control ` \
+  ` # plane IPs, on destination port 6443. This is where the other nodes` \
+  ` # will connect when they join the cluster. ` \
   --control-plane-endpoint 192.168.0.12:6443 \
+  --pod-network-cidr ${POD_CIDR} \
+  --service-cidr ${SERVICE_CIDR} \
+  ` # This is required because the VM has 2 interfaces, and by default ` \
+  ` # kubeadm selects the one with the default route to the gateway.` \
+  ` # In Vagrant's case, that is the "IPMI" control interface eth0 . We want ` \
+  ` # To use the second interface: eth1 . This IP is where the other nodes ` \
+  ` # that join the cluster, are going to connect to etcd for example(to ` \
+  ` # join/form the etcd cluster). ` \
+  --apiserver-advertise-address ${local_ip} \
   &&
+  # --apiserver-cert-extra-sans 192.168.0.12 \
+  #
   # --control-plane-endpoint ${CONTROL_IP}:6443 \
   # --node-name $(hostname -s) \
   # --image-repository registry.example.com/my_containers \
@@ -42,7 +68,11 @@ mkdir -p ${config_path} &&
 # delete it for saving new configuration.
 rm -f ${config_path}/* &&
 cp -i /etc/kubernetes/admin.conf ${config_path}/config &&
-kubeadm token create --print-join-command > ${config_path}/join_worker.sh &&
+(
+  kubeadm token create --print-join-command &&
+  echo -n " --v 5" &&
+  true
+) > ${config_path}/join_worker.sh &&
 (
   echo -n "$(cat ${config_path}/join_worker.sh)" &&
   echo -n " --control-plane --certificate-key " &&

@@ -12,7 +12,7 @@ config_path="/vagrant/configs" &&
 # Workers don't need to pull images
 
 echo "Joining the node to the cluster ..." &&
-/bin/bash -x ${config_path}/join_worker.sh -v &&
+/bin/bash -x ${config_path}/join_worker.sh &&
 
 echo "Copying kubeconfig to root's home folder ..." &&
 mkdir -p ${HOME}/.kube &&

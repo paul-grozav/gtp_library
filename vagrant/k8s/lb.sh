@@ -67,6 +67,21 @@ function start()
 function stop()
 {
   podman stop haproxy-k8s &&
+  podman rm haproxy-k8s &&
+  true
+} &&
+# ============================================================================ #
+
+
+
+
+
+# ============================================================================ #
+# Logs LB
+# ============================================================================ #
+function logs()
+{
+  podman logs -f haproxy-k8s &&
   true
 } &&
 # ============================================================================ #
@@ -83,6 +98,7 @@ function print-help()
   echo "Usage:
   --start           Start LB.
   --stop            Stop LB.
+  --logs            Follow logs.
   --help            Print this help menu.
   anything-else     Print this help menu." &&
   true
@@ -112,6 +128,7 @@ then
   case "${first_param}" in
     --start) ${first_param#--} ${@} ; exit_code=${?} ;;
     --stop) ${first_param#--} ${@} ; exit_code=${?} ;;
+    --logs) ${first_param#--} ${@} ; exit_code=${?} ;;
     *) print-help ; exit_code=0 ;;
   esac
 fi &&

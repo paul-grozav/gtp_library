@@ -12,8 +12,27 @@ config_path="/vagrant/configs" &&
 echo "Downloading K8s images ..." &&
 kubeadm config images pull &&
 
+local_ip="$(ip --json a s | jq -r ".[] |
+  if .ifname == \"eth1\"
+  then
+    .addr_info[] |
+      if .family == \"inet\"
+      then
+        .local
+      else
+        empty
+      end
+  else
+    empty
+  end"
+)" &&
+
 echo "Joining the node to the cluster ..." &&
-/bin/bash -x ${config_path}/join_control_plane.sh -v &&
+(
+  echo -n $(cat ${config_path}/join_control_plane.sh) &&
+  echo -n " --apiserver-advertise-address ${local_ip}" &&
+  true
+) | /bin/bash -x &&
 
 echo "Copying kubeconfig to root's home folder ..." &&
 mkdir -p ${HOME}/.kube &&

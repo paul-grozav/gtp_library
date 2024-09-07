@@ -17,17 +17,21 @@ IP_NW = IP_SECTIONS.captures[0]
 # Last octet excluding all dots:
 IP_START = Integer(IP_SECTIONS.captures[1])
 NUM_WORKER_NODES = settings["nodes"]["workers"]["count"]
+NUM_CONTROL_NODES = settings["nodes"]["control"]["count"]
 
 Vagrant.configure("2") do |config|
-  config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START, "NUM_WORKER_NODES" => NUM_WORKER_NODES }, inline: <<-SHELL
-      set +x &&
-      echo "${IP_NW}${IP_START} control-plane" >> /etc/hosts &&
-      for i in `seq 1 ${NUM_WORKER_NODES}`
-      do
-        echo "${IP_NW}$((IP_START+i)) node-${i}" >> /etc/hosts
-      done &&
-      true
-  SHELL
+  config.vm.provision "shell",
+    env: {
+      "IP_NW" => IP_NW,
+      "IP_START" => IP_START,
+      "NUM_CONTROL_NODES" => NUM_CONTROL_NODES,
+      "NUM_WORKER_NODES" => NUM_WORKER_NODES,
+      "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
+      "ENVIRONMENT" => settings["environment"],
+      "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+      "KUBERNETES_VERSION_SHORT" => settings["software"]["kubernetes"][0..3],
+    },
+    path: "scripts/common.sh"
 
   if `uname -m`.strip == "aarch64"
     config.vm.box = settings["software"]["box"] + "-arm64"
@@ -37,75 +41,90 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = true
 
   # Create 1 Control plane VM
-  config.vm.define "control-plane" do |controlplane|
-    controlplane.vm.hostname = "control-plane"
-    controlplane.vm.network "private_network", ip: settings["network"]["control_ip"]
+  config.vm.define "control-plane-1" do |node|
+    node.vm.hostname = "control-plane-1"
+    node.vm.network "private_network", ip: settings["network"]["control_ip"]
     if settings["shared_folders"]
       settings["shared_folders"].each do |shared_folder|
-        controlplane.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
+        node.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
       end
     end
-    controlplane.vm.provider "virtualbox" do |vb|
-        vb.cpus = settings["nodes"]["control"]["cpu"]
-        vb.memory = settings["nodes"]["control"]["memory"]
-        if settings["cluster_name"] and settings["cluster_name"] != ""
-          vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
-        end
+    node.vm.provider "virtualbox" do |vb|
+      vb.cpus = settings["nodes"]["control"]["cpu"]
+      vb.memory = settings["nodes"]["control"]["memory"]
+      if settings["cluster_name"] and settings["cluster_name"] != ""
+        vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+      end
     end
-    controlplane.vm.provision "shell",
-      env: {
-        "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
-        "ENVIRONMENT" => settings["environment"],
-        "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
-        "KUBERNETES_VERSION_SHORT" => settings["software"]["kubernetes"][0..3],
-      },
-      path: "scripts/common.sh"
-    controlplane.vm.provision "shell",
+    node.vm.provision "shell",
       env: {
         "CALICO_VERSION" => settings["software"]["calico"],
         "CONTROL_IP" => settings["network"]["control_ip"],
         "POD_CIDR" => settings["network"]["pod_cidr"],
         "SERVICE_CIDR" => settings["network"]["service_cidr"]
       },
-      path: "scripts/master.sh"
+      path: "scripts/control_plane.sh"
   end
 
-  # Might want to add multiple control planes in the future
-
-  # Create N worker nodes
-  (1..NUM_WORKER_NODES).each do |i|
-
-    config.vm.define "node-#{i}" do |node|
-      node.vm.hostname = "node-#{i}"
-      node.vm.network "private_network", ip: IP_NW + "#{IP_START + i}"
+  # Might want to add multiple control planes nodes
+  (2..NUM_CONTROL_NODES).each do |i|
+    config.vm.define "control-plane-#{i}" do |node|
+      node.vm.hostname = "control-plane-#{i}"
+      node.vm.network "private_network", ip: IP_NW + "#{IP_START - 1 + i}"
       if settings["shared_folders"]
         settings["shared_folders"].each do |shared_folder|
           node.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
         end
       end
       node.vm.provider "virtualbox" do |vb|
-          vb.cpus = settings["nodes"]["workers"]["cpu"]
-          vb.memory = settings["nodes"]["workers"]["memory"]
-          if settings["cluster_name"] and settings["cluster_name"] != ""
-            vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
-          end
+        vb.cpus = settings["nodes"]["control"]["cpu"]
+        vb.memory = settings["nodes"]["control"]["memory"]
+        if settings["cluster_name"] and settings["cluster_name"] != ""
+          vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+        end
       end
       node.vm.provision "shell",
         env: {
-          "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
-          "ENVIRONMENT" => settings["environment"],
-          "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
-          "KUBERNETES_VERSION_SHORT" => settings["software"]["kubernetes"][0..3],
+          "CALICO_VERSION" => settings["software"]["calico"],
+          "CONTROL_IP" => settings["network"]["control_ip"],
+          "POD_CIDR" => settings["network"]["pod_cidr"],
+          "SERVICE_CIDR" => settings["network"]["service_cidr"]
         },
-        path: "scripts/common.sh"
-      node.vm.provision "shell", path: "scripts/node.sh"
+        path: "scripts/control_plane_subsequent.sh"
+    end
+  end
+
+  # Create N worker nodes
+  (1..NUM_WORKER_NODES).each do |i|
+    config.vm.define "worker-#{i}" do |node|
+      node.vm.hostname = "worker-#{i}"
+      node.vm.network "private_network", ip: IP_NW + "#{IP_START - 1 + NUM_CONTROL_NODES + i}"
+      if settings["shared_folders"]
+        settings["shared_folders"].each do |shared_folder|
+          node.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
+        end
+      end
+      node.vm.provider "virtualbox" do |vb|
+        vb.cpus = settings["nodes"]["workers"]["cpu"]
+        vb.memory = settings["nodes"]["workers"]["memory"]
+        if settings["cluster_name"] and settings["cluster_name"] != ""
+          vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+        end
+      end
+      node.vm.provision "shell", path: "scripts/worker.sh"
 
       # Only install the dashboard after provisioning the last worker (and when enabled).
-      if i == NUM_WORKER_NODES and settings["software"]["dashboard"] and settings["software"]["dashboard"] != ""
-        node.vm.provision "shell", path: "scripts/dashboard.sh"
-      end
+#      if i == NUM_WORKER_NODES
+#        # At this point, the last worker was created
+#        if settings["software"]["dashboard"] and settings["software"]["dashboard"] != ""
+#          node.vm.provision "shell", path: "scripts/dashboard.sh"
+#        end
+#        if settings["software"]["longhorn"] and settings["software"]["longhorn"] != ""
+#          node.vm.provision "shell", path: "scripts/longhorn.sh"
+#        end
+#      end
     end
-
   end
+
 end
 # ============================================================================ #

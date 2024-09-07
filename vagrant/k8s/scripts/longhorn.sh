@@ -5,5 +5,5 @@
 # ============================================================================ #
 # Deploys the Kubernetes dashboard when enabled in settings.yml
 # ============================================================================ #
-bash /vagrant/scripts/common.sh --dashboard
+bash /vagrant/scripts/common.sh --longhorn
 # ============================================================================ #

@@ -19,15 +19,16 @@ kubeadm init \
   --service-cidr ${SERVICE_CIDR} \
   --ignore-preflight-errors Swap \
   --upload-certs \
-  --control-plane-endpoint ${CONTROL_IP}:6443 \
+  --control-plane-endpoint 192.168.0.12:6443 \
   &&
-  # --apiserver-count=3 \
+  # --control-plane-endpoint ${CONTROL_IP}:6443 \
   # --node-name $(hostname -s) \
+  # --image-repository registry.example.com/my_containers \
 
 echo "Copying kubeconfig to root's home folder ..." &&
 mkdir -p ${HOME}/.kube &&
 cp -i /etc/kubernetes/admin.conf ${HOME}/.kube/config &&
-chown $(id -u):$(id -g) ${HOME}/.kube/config &&
+chown $(id -u):$(id -g) -R ${HOME}/.kube &&
 
 echo "Copying kubeconfig to vagrant's home folder ..." &&
 mkdir -p /home/vagrant/.kube &&
@@ -50,9 +51,15 @@ kubeadm token create --print-join-command > ${config_path}/join_worker.sh &&
   true
 ) > ${config_path}/join_control_plane.sh &&
 
+schedule=$(yq .nodes.control.schedule /vagrant/settings.yml) &&
+if [ "${schedule}" == "true" ]
+then
+  ( kubectl taint nodes --all node-role.kubernetes.io/control-plane- ||
+    true ) &&
+  true
+fi &&
+
 echo "Installing Calico Network Plugin ..." &&
-#curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml -O &&
-#kubectl apply -f calico.yaml &&
 calico_url="https://raw.githubusercontent.com/projectcalico/calico" &&
 calico_url="${calico_url}/v${CALICO_VERSION}/manifests/calico.yaml" &&
 kubectl apply -f ${calico_url} &&
@@ -61,6 +68,9 @@ echo "Installing Metrics Server ..." &&
 metrics_url="https://raw.githubusercontent.com/techiescamp/kubeadm-scripts" &&
 metrics_url="${metrics_url}/main/manifests/metrics-server.yaml" &&
 kubectl apply -f ${metrics_url} &&
+
+bash /vagrant/scripts/common.sh --dashboard &&
+bash /vagrant/scripts/common.sh --longhorn &&
 
 echo "Done setting up the control plane node!" &&
 exit 0

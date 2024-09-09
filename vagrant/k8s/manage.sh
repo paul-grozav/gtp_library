@@ -498,7 +498,7 @@ function control-plane-first()
   rm -f ${config_path}/* &&
   cp -i /etc/kubernetes/admin.conf ${config_path}/config &&
   (
-    kubeadm token create --print-join-command &&
+    echo -n $( kubeadm token create --print-join-command ) &&
     echo -n " --v 5" &&
     true
   ) > ${config_path}/join_worker.sh &&

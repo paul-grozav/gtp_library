@@ -20,6 +20,8 @@ exit_code=0 &&
 config_path="/vagrant/configs" &&
 lb_container_name="haproxy-k8s" &&
 lb_container_image="docker.io/haproxy:3.0.4-alpine3.20" &&
+reg_container_name="k8s_registry" &&
+reg_container_image="docker.io/registry:2.8.3" &&
 
 # Dynamic variables
 script_dir="$( cd $( dirname ${0} ) && pwd )" &&
@@ -84,6 +86,20 @@ function lb-stop()
 {
   ${cmgr} stop ${lb_container_name} &&
   ${cmgr} rm ${lb_container_name} &&
+  true
+} &&
+# ============================================================================ #
+
+
+
+
+
+# ============================================================================ #
+# Show the status of the LoadBalancer container on the host where VM(s) run.
+# ============================================================================ #
+function lb-status()
+{
+  ${cmgr} ps -a | grep -w ${lb_container_name} &&
   true
 } &&
 # ============================================================================ #
@@ -479,7 +495,7 @@ function control-plane-first()
     # --apiserver-cert-extra-sans 192.168.0.12 \
     #
     # --node-name $(hostname -s) \
-    # --image-repository registry.example.com/my_containers \
+    # --image-repository 192.168.43.206:8443 \
 
   echo "Copying kubeconfig to root's home folder ..." &&
   mkdir -p ${HOME}/.kube &&
@@ -608,13 +624,157 @@ function worker()
 
 
 # ============================================================================ #
+# Create and start the stack.
+# ============================================================================ #
+function up()
+{
+  lb-start &&
+  ( cd ${script_dir} && vagrant up ) &&
+  true
+} &&
+# ============================================================================ #
+
+
+
+
+
+# ============================================================================ #
+# Stop and destroy the stack.
+# ============================================================================ #
+function down()
+{
+  ( cd ${script_dir} && vagrant destroy -f ) &&
+  lb-stop || true &&
+  true
+} &&
+# ============================================================================ #
+
+
+
+
+
+# ============================================================================ #
+# Start the stack.
+# ============================================================================ #
+function start()
+{
+  lb-start &&
+  ( cd ${script_dir} && vagrant up ) &&
+  true
+} &&
+# ============================================================================ #
+
+
+
+
+
+# ============================================================================ #
+# Stop the stack.
+# ============================================================================ #
+function stop()
+{
+  ( cd ${script_dir} && vagrant halt ) &&
+  lb-stop || true &&
+  true
+} &&
+# ============================================================================ #
+
+
+
+
+
+# ============================================================================ #
+# Show the status of the stack.
+# ============================================================================ #
+function status()
+{
+  lb-status &&
+  ( cd ${script_dir} && vagrant status ) &&
+  true
+} &&
+# ============================================================================ #
+
+
+
+
+
+# ============================================================================ #
+# Start local container registry.
+# ============================================================================ #
+function registry-start()
+{
+  mkdir -p ${script_dir}/registry_storage &&
+  if [ ! -f ${script_dir}/cert.pem ] || [ ! -f ${script_dir}/key.pem ]
+  then
+    openssl req -x509 -newkey rsa:4096 -keyout ${script_dir}/key.pem \
+    -out ${script_dir}/cert.pem \
+    -sha256 -days 3650 -nodes -subj \
+    "/C=XX/ST=StateName/L=CityName/O=CompanyName"\
+"/OU=CompanySectionName/CN=CommonNameOrHostname"
+  fi &&
+  ( #exit 0 ;
+  ${cmgr} stop -t0 ${reg_container_name} || true &&
+  ${cmgr} run \
+    --detach \
+    --rm \
+    --name ${reg_container_name} \
+    --publish 0.0.0.0:8443:443/tcp \
+    --env REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+    --env REGISTRY_HTTP_TLS_CERTIFICATE=${script_dir}/cert.pem \
+    --env REGISTRY_HTTP_TLS_KEY=${script_dir}/key.pem \
+    --env REGISTRY_HTTP_TLS_MINIMUMTLS=tls1.2 \
+    --volume ${script_dir}/cert.pem:${script_dir}/cert.pem:ro \
+    --volume ${script_dir}/key.pem:${script_dir}/key.pem:ro \
+    --volume ${script_dir}/registry_storage:/var/lib/registry:rw \
+    ${reg_container_image} \
+    ) &&
+  # ${cmgr} push --tls-verify=false 127.0.0.1:8443/busybox:1.36.1 &&
+  skopeo="${cmgr} run docker://quay.io/skopeo/stable:v1.16.1" &&
+
+  for img in \
+    registry.k8s.io/kube-apiserver:v1.31.0 \
+    registry.k8s.io/kube-controller-manager:v1.31.0 \
+    registry.k8s.io/kube-scheduler:v1.31.0 \
+    registry.k8s.io/kube-proxy:v1.31.0 \
+    registry.k8s.io/coredns/coredns:v1.11.1 \
+    registry.k8s.io/pause:3.10 \
+    registry.k8s.io/etcd:3.5.15-0 \
+    ;
+  do
+    reg_host="$( echo "${img}" | awk -F'/' '{print $1}' )" &&
+    reg_img_path="$( echo "${img}" | awk -F'/' '{
+      for(i=2;i<=NF;i++){
+        printf $i;
+        if(i<NF){printf "/"}
+      }; print ""}' )" &&
+    ${skopeo} copy --dest-tls-verify=false \
+      docker://${reg_host}/${reg_img_path} \
+      docker://192.168.43.206:8443/${reg_img_path} \
+      &&
+    true
+  done &&
+  true
+} &&
+# ============================================================================ #
+
+
+
+
+
+# ============================================================================ #
 # Prints a help menu.
 # ============================================================================ #
 function print-help()
 {
   echo "Usage:
+  --up                         Bring up the stack.
+  --down                       Destroy the stack.
+  --start                      Start the pre-created stack.
+  --stop                       Stop the stack but don't remove it.
+  --status                     Show the status of the stack.
   --lb-start                   Start LoadBalancer container.
   --lb-stop                    Stop LoadBalancer container.
+  --lb-status                  Show the status of the LoadBalancer container.
   --lb-logs                    Show the LoadBalancer container logs.
   --config-generic-box         Configure a generic box.
   --common-all-nodes           Run setup that is common for all nodes.
@@ -623,6 +783,7 @@ function print-help()
   --longhorn                   Install LongHorn.
   --control-plane-subsequent   Configure additional control plane node(s).
   --worker                     Configure worker node(s).
+  --registry-start             Start the local container registry.
   --help                       Print this help menu.
   anything-else                Print this help menu." &&
   true
@@ -649,8 +810,14 @@ shift &&
 if [ ${first_param} ]
 then
   case "${first_param}" in
+    --up) ${first_param#--} ${@} ; exit_code=${?} ;;
+    --down) ${first_param#--} ${@} ; exit_code=${?} ;;
+    --start) ${first_param#--} ${@} ; exit_code=${?} ;;
+    --stop) ${first_param#--} ${@} ; exit_code=${?} ;;
+    --status) ${first_param#--} ${@} ; exit_code=${?} ;;
     --lb-start) ${first_param#--} ${@} ; exit_code=${?} ;;
     --lb-stop) ${first_param#--} ${@} ; exit_code=${?} ;;
+    --lb-status) ${first_param#--} ${@} ; exit_code=${?} ;;
     --lb-logs) ${first_param#--} ${@} ; exit_code=${?} ;;
     --config-generic-box) ${first_param#--} ${@} ; exit_code=${?} ;;
     --common-all-nodes) ${first_param#--} ${@} ; exit_code=${?} ;;
@@ -659,6 +826,7 @@ then
     --longhorn) ${first_param#--} ${@} ; exit_code=${?} ;;
     --control-plane-subsequent) ${first_param#--} ${@} ; exit_code=${?} ;;
     --worker) ${first_param#--} ${@} ; exit_code=${?} ;;
+    --registry-start) ${first_param#--} ${@} ; exit_code=${?} ;;
     *) print-help ; exit_code=0 ;;
   esac
 fi &&

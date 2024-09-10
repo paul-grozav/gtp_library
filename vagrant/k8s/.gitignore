@@ -7,4 +7,10 @@
 
 # files generated for the new cluster
 configs
+
+# container registry for storing images required by the K8s cluster
+registry_storage
+# self signed certificate and key generated for our registry
+cert.pem
+key.pem
 # ============================================================================ #

@@ -58,7 +58,8 @@ cp /mnt/get_binaries.sh /srv/tftp/ &&
 (
   cd /var/www/html &&
   cp /srv/tftp/tiny_core_linux.iso . &&
-  #cp /srv/tftp/pxe_syslinux/memdisk . &&
+  cp /srv/tftp/syslinux/Intel_x86PC/memdisk . &&
+  wget https://cdn.openbsd.org/pub/OpenBSD/7.6/i386/cd76.iso &&
   wget https://tancredi-paul-grozav.gitlab.io/aleph/distribution_content/aleph.krnl &&
   wget https://tancredi-paul-grozav.gitlab.io/aleph/distribution_content/aleph.ird &&
   wget https://tancredi-paul-grozav.gitlab.io/aleph/distribution_content/aleph.sfs &&

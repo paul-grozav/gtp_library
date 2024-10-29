@@ -16,13 +16,16 @@ serial 0 115200
 
 # Default label to boot after timeout
 default aleph
+#default tcl_tftp
+#default openbsd_iso
+#default openbsd
 #ontimeout tcl_http
 
 # timeout in 1/10 seconds.
 timeout 100
 
 # Re-attempt n times to find/retrieve/open a file before giving up.
-pxeretry 10
+pxeretry 3
 
 # List of labels
 label tcl_http
@@ -31,8 +34,17 @@ label tcl_http
   append initrd=http://192.168.10.2:/tiny_core_linux.iso iso
 
 label tcl_tftp
-  kernel /pxe_syslinux/memdisk
-  append initrd=/tiny_core_linux.iso iso keeppxe
+  kernel tftp://192.168.10.2/syslinux/Intel_x86PC/memdisk
+  append initrd=tftp://192.168.10.2/tiny_core_linux.iso iso keeppxe
+
+label windows_iso_tftp
+  kernel tftp://192.168.10.2/syslinux/Intel_x86PC/memdisk
+  append initrd=tftp://192.168.10.2/Win10_22H2_English_x32v1.iso iso keeppxe
+
+
+label freedos_iso_tftp
+  kernel tftp://192.168.10.2/syslinux/Intel_x86PC/memdisk
+  append initrd=tftp://192.168.10.2/FD13LIVE.iso iso keeppxe
 
 label aleph
   kernel http://192.168.10.2/aleph.krnl
@@ -40,7 +52,16 @@ label aleph
 #  append ip=dhcp interface=enp0s8 initrd=http://192.168.10.2/aleph.ird console=ttyS0 console=tty0 rooturl=http://192.168.10.2/aleph.sfs config_srv_url=http://192.168.10.2/aleph_config boot=pxe maxTryCount=10
   append ip=:::::enp0s8:dhcp initrd=http://192.168.10.2/aleph.ird console=ttyS0 console=tty0 rooturl=http://192.168.10.2/aleph.sfs config_srv_url=http://192.168.10.2/aleph_config boot=pxe maxTryCount=10
 
-#label aleph
-#  kernel aleph.krn
-#  append initrd=aleph.ird ro
+# Apparently this needs to be booted by BIOS directly from TFTP
+#label openbsd
+#  kernel tftp://192.168.10.2/pxeboot
+#  append initrd=tftp://192.168.10.2/bsd.rd
+#  kernel tftp://192.168.10.2/syslinux/Intel_x86PC/chain.c32
+#  append boot file=tftp://192.168.10.2/pxeboot
+
+# crashes after starting the iso
+#label openbsd_iso
+#  kernel tftp://192.168.10.2/syslinux/Intel_x86PC/memdisk
+#  append initrd=tftp://192.168.10.2/cd76.iso iso keeppxe
 # ============================================================================ #
+

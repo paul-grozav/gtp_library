@@ -9,6 +9,24 @@
 # $ sudo cp /mnt/get_binaries.sh /srv/tftp/ &&
 #   ( cd /srv/tftp && sudo bash -x ./get_binaries.sh )
 # ============================================================================ #
+# This should fill in both tftp and http server's data directories.
+# TFTP should offer:
+# - syslinux - for booting GNU/Linux distributions
+# - os - folder with operating systems
+#   - openbsd
+#   - linux
+#     - debian
+#     - centos
+#     - ubuntu
+#   - freedos
+#   - windows
+#   - reactos
+# - GRUB
+# - iso folder with iso files
+# HTTP should offer:
+# - symlink to iso folder in TFTP
+# - symlink to os folder in TFTP
+# ============================================================================ #
 set -x &&
 # Current directory, where the script exists
 current_directory="$(cd $(dirname $0); pwd)" &&
@@ -34,15 +52,16 @@ fi &&
 #  mkdir -p ${pxe_syslinux_dir}
 #fi &&
 
-rm -f \
-  {${current_directory},${pxe_syslinux_dir}}/lpxelinux.0 \
-  {${current_directory},${pxe_syslinux_dir}}/ldlinux.c32 \
-  {${current_directory},${pxe_syslinux_dir}}/menu.c32 \
-  {${current_directory},${pxe_syslinux_dir}}/libutil.c32 \
-  {${current_directory},${pxe_syslinux_dir}}/pxechn.c32 \
-  {${current_directory},${pxe_syslinux_dir}}/libcom32.c32 \
-  {${current_directory},${pxe_syslinux_dir}}/memdisk \
-  &&
+#rm -f \
+#  {${current_directory},${pxe_syslinux_dir}}/lpxelinux.0 \
+#  {${current_directory},${pxe_syslinux_dir}}/ldlinux.c32 \
+#  {${current_directory},${pxe_syslinux_dir}}/menu.c32 \
+#  {${current_directory},${pxe_syslinux_dir}}/libutil.c32 \
+#  {${current_directory},${pxe_syslinux_dir}}/pxechn.c32 \
+#  {${current_directory},${pxe_syslinux_dir}}/libcom32.c32 \
+#  {${current_directory},${pxe_syslinux_dir}}/chain.c32 \
+#  {${current_directory},${pxe_syslinux_dir}}/memdisk \
+#  &&
 
 # ============================================================================ #
 # This is for clients booting from the Legacy BIOS firmware(ROM)
@@ -57,17 +76,37 @@ function Intel_x86PC__clients()
   # name by using --transform 's/lpxelinux.0/new_name.bin/'
   tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
     -C ${destination} \
-    --strip-components 3 ${syslinux_folder}/bios/core/lpxelinux.0 &&
+    --strip-components 3 \
+    ${syslinux_folder}/bios/core/lpxelinux.0 \
+    &&
   tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
     -C ${destination} \
     --strip-components 5 \
     ${syslinux_folder}/bios/com32/elflink/ldlinux/ldlinux.c32 \
     &&
+
   # If this points to an absolute path, TFTP server will not be able to read it
   # because it runs in a chroot jail. So, it needs to be relative.
   # ln -s ${current_directory}/pxelinux.cfg ${destination} &&
   ln -s $(realpath -s --relative-to=${destination} \
     ${current_directory})/pxelinux.cfg ${destination} &&
+
+  # These are needed to chain-load other (non-linux) operating systems
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/bios/com32/chain/chain.c32 \
+    &&
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/bios/com32/lib/libcom32.c32 \
+    &&
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/bios/com32/libutil/libutil.c32 \
+    &&
 
   # /pxelinux.cfg/default will require /menu.c32 to display the boot menu
   # and /menu.c32 requires /libutil.c32 .
@@ -88,9 +127,10 @@ function Intel_x86PC__clients()
   #mv ${current_directory}/libcom32.c32 ${pxe_syslinux_dir} &&
 
   # To make a boot entry load an .iso file we need memdisk
-#  tar xvf ${current_directory}/${syslinux_folder}.tar.gz --strip-components \
-#    3 ${syslinux_folder}/bios/memdisk/memdisk &&
-#  mv ${current_directory}/memdisk ${pxe_syslinux_dir} &&
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 3 \
+    ${syslinux_folder}/bios/memdisk/memdisk &&
   true
 } && Intel_x86PC__clients &&
 # ============================================================================ #
@@ -114,11 +154,29 @@ function EFI_IA32__clients()
     --strip-components 5 \
     ${syslinux_folder}/efi32/com32/elflink/ldlinux/ldlinux.e32 \
     &&
+
   # If this points to an absolute path, TFTP server will not be able to read it
   # because it runs in a chroot jail. So, it needs to be relative.
   # ln -s ${current_directory}/pxelinux.cfg ${destination} &&
   ln -s $(realpath -s --relative-to=${destination} \
     ${current_directory})/pxelinux.cfg ${destination} &&
+
+  # These are needed to chain-load other (non-linux) operating systems
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/efi32/com32/chain/chain.c32 \
+    &&
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/efi32/com32/lib/libcom32.c32 \
+    &&
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/efi32/com32/libutil/libutil.c32 \
+    &&
   true
 } && EFI_IA32__clients &&
 # ============================================================================ #
@@ -142,11 +200,29 @@ function EFI_x86-64__clients()
     --strip-components 5 \
     ${syslinux_folder}/efi64/com32/elflink/ldlinux/ldlinux.e64 \
     &&
+
   # If this points to an absolute path, TFTP server will not be able to read it
   # because it runs in a chroot jail. So, it needs to be relative.
   # ln -s ${current_directory}/pxelinux.cfg ${destination} &&
   ln -s $(realpath -s --relative-to=${destination} \
     ${current_directory})/pxelinux.cfg ${destination} &&
+
+  # These are needed to chain-load other (non-linux) operating systems
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/efi64/com32/chain/chain.c32 \
+    &&
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/efi64/com32/lib/libcom32.c32 \
+    &&
+  tar xvf ${current_directory}/${syslinux_folder}.tar.gz \
+    -C ${destination} \
+    --strip-components 4 \
+    ${syslinux_folder}/efi64/com32/libutil/libutil.c32 \
+    &&
   true
 } && EFI_x86-64__clients &&
 # ============================================================================ #

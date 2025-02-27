@@ -1,0 +1,67 @@
+@startuml
+'------------------------------------------------------------------------------'
+' Author: Tancredi-Paul Grozav <paul@grozav.info>
+' To view the diagram:
+' - go to: https://www.planttext.com/
+' - paste the source and press Alt + Enter or click Refresh btn
+'------------------------------------------------------------------------------'
+title network_boot
+
+' style
+skinparam {
+  BackgroundColor #e6f3ff
+  ActorBackgroundColor #e6f3ff
+  ActorBorderColor black
+  ParticipantBackgroundColor #e6f3ff
+  ParticipantBorderColor black
+  ArrowColor black
+  ComponentBackgroundColor #e6f3ff
+  SequenceLifeLineBorderColor black
+  NoteBackgroundColor #c9deff
+  NoteBorderColor #5b87cf
+  SequenceDividerBackgroundColor #e6f3ff
+}
+
+participant "<size:48><&terminal></size>\nnode-01" as node_01
+participant DHCP
+participant "TFTP\n(next-server)" as TFTP
+participant HTTP
+
+
+node_01 -> node_01 : BIOS firmware performs network boot
+== DHCP ==
+node_01 -> DHCP : DHCPDISCOVER (Arch, MAC)
+DHCP -> node_01 : DHCPOFFER (IP, next-server, filename)
+node_01 -> DHCP : DHCPREQUEST (IP)
+DHCP -> node_01 : DHCPACK (IP)
+
+== TFTP ==
+node_01 -> TFTP : Request filename (lpxelinux.0)
+TFTP -> node_01 : Receive filename (lpxelinux.0)
+...
+
+node_01 -> node_01 : Run lpxelinux.0
+node_01 -> TFTP : Request config (pxelinux.cfg/MAC)
+TFTP -> node_01 : Receive error that file does not exist
+node_01 -> TFTP : Request config (pxelinux.cfg/default)
+TFTP -> node_01 : Receive filename (pxelinux.cfg/default)
+
+== HTTP ==
+node_01 -> HTTP : Request kernel (vmlinuz)
+HTTP -> node_01 : Receive kernel
+node_01 -> HTTP : Request Init RAM Disk/FileSystem (initramfs)
+HTTP -> node_01 : Receive initramfs
+
+...
+
+node_01 -> node_01 : 1. Run Linux kernel\n2. Start InitRAMFS\n3. Configure \
+network
+node_01 -> HTTP : Request SquashFS
+HTTP -> node_01 : Receive SquashFS
+
+...
+
+node_01 -> node_01 : 1. Mount SquashFS as / (root)\n2. Start /sbin/init from it
+
+'------------------------------------------------------------------------------'
+@enduml

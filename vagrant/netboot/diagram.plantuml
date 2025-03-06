@@ -23,15 +23,30 @@ skinparam {
 }
 
 participant "<size:48><&terminal></size>\nnode-01" as node_01
-participant DHCP
-participant "TFTP\n(next-server)" as TFTP
-participant HTTP
+participant "DHCP\n(**192.168.1.4**)" as DHCP
+participant "TFTP\n(**192.168.1.3**)" as TFTP
+participant "HTTP\n(**192.168.1.5**)" as HTTP
 
 
 node_01 -> node_01 : BIOS firmware performs network boot
 == DHCP ==
 node_01 -> DHCP : DHCPDISCOVER (Arch, MAC)
-DHCP -> node_01 : DHCPOFFER (IP, next-server, filename)
+DHCP -> node_01 : DHCPOFFER
+note right
+  Your (client) IP address: **192.168.1.201**
+  Next server IP address: **192.168.1.3**
+  Boot file name: **lpxelinux.0**
+  options:
+  1. Subnet Mask: **255.255.255.0**
+  3. Router (Gateway): **192.168.1.1**
+  6. Domain Name Server: **192.168.1.2**
+  12. Host Name: **test-vm**
+  15. Domain Name: **srv.paul.grozav.info**
+  54. DHCP Server Identifier: **192.168.1.4**
+  119. Domain Search: **srv.paul.grozav.info; my.ro**
+  208. PXELINUX Magic: **f1:00:74:7e**
+  210. PXE Path Prefix: **http://192.168.1.5:30080/pxeboot/**
+end note
 node_01 -> DHCP : DHCPREQUEST (IP)
 DHCP -> node_01 : DHCPACK (IP)
 
@@ -39,14 +54,14 @@ DHCP -> node_01 : DHCPACK (IP)
 node_01 -> TFTP : Request filename (lpxelinux.0)
 TFTP -> node_01 : Receive filename (lpxelinux.0)
 ...
-
 node_01 -> node_01 : Run lpxelinux.0
-node_01 -> TFTP : Request config (pxelinux.cfg/MAC)
-TFTP -> node_01 : Receive error that file does not exist
-node_01 -> TFTP : Request config (pxelinux.cfg/default)
-TFTP -> node_01 : Receive filename (pxelinux.cfg/default)
 
 == HTTP ==
+node_01 -> HTTP : Request config (pxelinux.cfg/MAC)
+HTTP -> node_01 : Receive error that file does not exist
+node_01 -> HTTP : Request config (pxelinux.cfg/default)
+HTTP -> node_01 : Receive filename (pxelinux.cfg/default)
+
 node_01 -> HTTP : Request kernel (vmlinuz)
 HTTP -> node_01 : Receive kernel
 node_01 -> HTTP : Request Init RAM Disk/FileSystem (initramfs)

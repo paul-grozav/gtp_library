@@ -38,7 +38,8 @@ apt-get update &&
 test="" &&
 # Only for debugging
 test="procps less nano rsyslog tftp-hpa curl net-tools tcpdump nmap" &&
-apt-get install -y dnsmasq isc-dhcp-server tftpd-hpa apache2 rpm2cpio ${test} &&
+apt-get install -y dnsmasq isc-dhcp-server tftpd-hpa apache2 rpm2cpio \
+  rsync ${test} &&
 apt clean &&
 
 # true ; exit 0 &&

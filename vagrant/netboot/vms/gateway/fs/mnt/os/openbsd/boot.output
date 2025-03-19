@@ -1,0 +1,449 @@
+>> OpenBSD/amd64 PXEBOOT 3.65
+com0: changing speed to 115200 baud in 5 seconds, change your terminal to match!
+
+com0: 115200 baud
+booting tftp:/bsd.rd: 4101039/ - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | +1721344/ - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ +3887112| / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ +0| / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - +704512\ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | /  [109- \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | +465408/ - \ | / - \ | / - \ | / - \ | / - +318888\ | / - \ | / - \ | ]=0xab0b98
+entry point at 0xffffffff81001000
+Copyright (c) 1982, 1986, 1989, 1991, 1993
+        The Regents of the University of California.  All rights reserved.
+Copyright (c) 1995-2024 OpenBSD. All rights reserved.  https://www.OpenBSD.org
+
+OpenBSD 7.6 (RAMDISK_CD) #326: Mon Sep 30 09:00:03 MDT 2024
+    deraadt@amd64.openbsd.org:/usr/src/sys/arch/amd64/compile/RAMDISK_CD
+real mem = 2129899520 (2031MB)
+avail mem = 2061246464 (1965MB)
+random: good seed from bootblocks
+mainbus0 at root
+bios0 at mainbus0: SMBIOS rev. 2.5 @ 0xe1000 (10 entries)
+bios0: vendor innotek GmbH version "VirtualBox" date 12/01/2006
+bios0: innotek GmbH VirtualBox
+acpi0 at bios0: ACPI 4.0
+acpi0: tables DSDT FACP APIC SSDT
+acpimadt0 at acpi0 addr 0xfee00000: PC-AT compat
+cpu0 at mainbus0: apid 0 (boot processor)
+cpu0: 13th Gen Intel(R) Core(TM) i7-1355U, 2610.03 MHz, 06-ba-03
+cpu0: cpuid 1 edx=178bfbff<FPU,VME,DE,PSE,TSC,MSR,PAE,MCE,CX8,APIC,SEP,MTRR,PGE,MCA,CMOV,PAT,PSE36,CFLUSH,MMX,FXSR,SSE,SSE2,HTT> ecx=c2da2203<SSE3,PCLMUL,SSSE3,CX16,PCID,SSE4.1,SSE4.2,MOVBE,POPCNT,AES,RDRAND,HV>
+cpu0: cpuid 6 eax=4<ARAT>
+cpu0: cpuid 7.0 ebx=208c2509<FSGSBASE,BMI1,BMI2,INVPCID,RDSEED,ADX,CLFLUSHOPT,SHA> edx=30000400<MD_CLEAR,L1DF>
+cpu0: cpuid 80000001 edx=28100800<NXE,RDTSCP,LONG> ecx=121<LAHF,ABM,3DNOWP>
+cpu0: cpuid 80000007 edx=100<ITSC>
+cpu0: msr 10a=1400e167<IBRS_ALL,RSBA,MDS_NO,IF_PSCHANGE,TAA_NO,SBDR_SSDP_N,FBSDP_NO,PSDP_NO,GDS_NO,RFDS_CLEAR>
+cpu0: 48KB 64b/line 12-way D-cache, 32KB 64b/line 8-way I-cache, 1MB 64b/line 10-way L2 cache, 12MB 64b/line 12-way L3 cache
+cpu0: apic clock running at 999MHz
+ioapic0 at mainbus0: apid 1 pa 0xfec00000, version 20, 24 pins, remapped
+acpiprt0 at acpi0: bus 0 (PCI0)
+acpipci0 at acpi0 PCI0: 0x00000000 0x00000011 0x00000001
+com0 at acpi0 SRL0 addr 0x3f8/0x8 irq 4: ns16550a, 16 byte fifo
+com0: console
+"PNP0C0A" at acpi0 not configured
+"ACPI0003" at acpi0 not configured
+acpicpu at acpi0 not configured
+cpu0: using VERW MDS workaround
+pvbus0 at mainbus0: KVM
+pci0 at mainbus0 bus 0
+pchb0 at pci0 dev 0 function 0 "Intel 82441FX" rev 0x02
+"Intel 82371SB ISA" rev 0x00 at pci0 dev 1 function 0 not configured
+vga1 at pci0 dev 2 function 0 "InnoTek Graphics Adapter" rev 0x00
+vga1: aperture needed
+wsdisplay at vga1 not configured
+"InnoTek Guest Service" rev 0x00 at pci0 dev 4 function 0 not configured
+ohci0 at pci0 dev 6 function 0 "Apple Intrepid USB" rev 0x00: apic 1 int 22, version 1.0
+"Intel 82371AB Power" rev 0x08 at pci0 dev 7 function 0 not configured
+em0 at pci0 dev 8 function 0 "Intel 82540EM" rev 0x02: apic 1 int 16, address 08:00:27:00:00:03
+ahci0 at pci0 dev 13 function 0 "Intel 82801HBM AHCI" rev 0x02: apic 1 int 21, AHCI 1.1
+ahci0: device on port 0 didn't come ready, TFD: 0x171<ERR>
+ahci0: port 0: 3.0Gb/s
+scsibus0 at ahci0: 32 targets
+sd0 at scsibus0 targ 0 lun 0: <ATA, VBOX HARDDISK, 1.0> t10.ATA_VBOX_HARDDISK_VBb6e75699-d97726a9_
+sd0: 40959MB, 512 bytes/sector, 83884479 sectors
+usb0 at ohci0: USB revision 1.0
+uhub0 at usb0 configuration 1 interface 0 "Apple OHCI root hub" rev 1.00/1.00 addr 1
+isa0 at mainbus0
+pckbc0 at isa0 port 0x60/5 irq 1 irq 12
+pckbd0 at pckbc0 (kbd slot)
+wskbd0 at pckbd0 mux 1
+uhidev0 at uhub0 port 1 configuration 1 interface 0 "VirtualBox USB Tablet" rev 1.10/1.00 addr 2
+uhidev0: iclass 3/0
+uhid at uhidev0 not configured
+softraid0 at root
+scsibus1 at softraid0: 256 targets
+PXE boot MAC address 08:00:27:00:00:03, interface em0
+root on rd0a swap on rd0b dump on rd0b
+WARNING: CHECK AND RESET THE DATE!
+erase ^?, werase ^W, kill ^U, intr ^C, status ^T
+
+Welcome to the OpenBSD/amd64 7.6 installation program.
+Starting non-interactive mode in 5 seconds...
+(I)nstall, (U)pgrade, (A)utoinstall or (S)hell?
+Fetching http://192.168.10.2/08:00:27:00:00:03-install.conf?path=7.6/amd64
+Fetching http://192.168.10.2/install.conf?path=7.6/amd64
+Performing non-interactive install...
+Terminal type? [vt220] vt220
+System hostname? (short form, e.g. 'foo') my-open-bsd
+
+Available network interfaces are: em0 vlan0.
+Network interface to configure? (name, lladdr, '?', or 'done') [em0] em0
+IPv4 address for em0? (or 'autoconf' or 'none') [autoconf] dhcp
+IPv6 address for em0? (or 'autoconf' or 'none') [none] none
+Available network interfaces are: em0 vlan0.
+Network interface to configure? (name, lladdr, '?', or 'done') [done] done
+Using DNS domainname home.server.paul.grozav.info
+Using DNS nameservers at 192.168.10.2
+
+Password for root account? <provided>
+Public ssh key for root account? [none] ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICFfZcR+pNjUP84kkmJ9Rh5PTOSC1aBu+PZiA2TqIutu jameswhite@bragi.local
+Start sshd(8) by default? [yes] yes
+Do you expect to run the X Window System? [yes] no
+Change the default console to com0? [yes] yes
+Available speeds are: 9600 19200 38400 57600 115200.
+Which speed should com0 use? (or 'done') [115200] 115200
+Setup a user? (enter a lower-case loginname, or 'no') [no] opt
+Full name for user opt? [opt] opt
+Password for user opt? <provided>
+Public ssh key for user opt [none] none
+WARNING: root is targeted by password guessing attacks, pubkeys are safer.
+Allow root ssh login? (yes, no, prohibit-password) [no] no
+
+Available disks are: sd0.
+Which disk is the root disk? ('?' for details) [sd0] sd0
+Encrypt the root disk with a (p)assphrase or (k)eydisk? [no] no
+No valid MBR or GPT.
+Use (W)hole disk MBR, whole disk (G)PT or (E)dit? [whole] whole
+Setting OpenBSD MBR partition to whole sd0...done.
+URL to autopartitioning template for disklabel? [none] none
+The auto-allocated layout for sd0 is:
+#                size           offset  fstype [fsize bsize   cpg]
+  a:             1.0G               64  4.2BSD   2048 16384     1 # /
+  b:             2.2G          2097216    swap                    
+  c:            40.0G                0  unused                    
+  d:             2.4G          6781472  4.2BSD   2048 16384     1 # /tmp
+  e:             3.8G         11848896  4.2BSD   2048 16384     1 # /var
+  f:             4.3G         19847936  4.2BSD   2048 16384     1 # /usr
+  g:             1.0G         28947008  4.2BSD   2048 16384     1 # /usr/X11R6
+  h:             5.3G         31044160  4.2BSD   2048 16384     1 # /usr/local
+  i:             2.6G         42181920  4.2BSD   2048 16384     1 # /usr/src
+  j:             6.0G         47581632  4.2BSD   2048 16384     1 # /usr/obj
+  k:            11.3G         60164544  4.2BSD   2048 16384     1 # /home
+Use (A)uto layout, (E)dit auto layout, or create (C)ustom layout? [a] a
+/dev/rsd0a: 1024.0MB in 2097152 sectors of 512 bytes
+6 cylinder groups of 202.50MB, 12960 blocks, 25920 inodes each
+/dev/rsd0k: 11582.0MB in 23719904 sectors of 512 bytes
+58 cylinder groups of 202.50MB, 12960 blocks, 25920 inodes each
+/dev/rsd0d: 2474.3MB in 5067424 sectors of 512 bytes
+13 cylinder groups of 202.50MB, 12960 blocks, 25920 inodes each
+/dev/rsd0f: 4442.9MB in 9099072 sectors of 512 bytes
+22 cylinder groups of 202.50MB, 12960 blocks, 25920 inodes each
+/dev/rsd0g: 1024.0MB in 2097152 sectors of 512 bytes
+6 cylinder groups of 202.50MB, 12960 blocks, 25920 inodes each
+/dev/rsd0h: 5438.4MB in 11137760 sectors of 512 bytes
+27 cylinder groups of 202.50MB, 12960 blocks, 25920 inodes each
+/dev/rsd0j: 6144.0MB in 12582912 sectors of 512 bytes
+31 cylinder groups of 202.50MB, 12960 blocks, 25920 inodes each
+newfs: reduced number of fragments per cylinder group from 103680 to 103584 to enlarge last cylinder group
+/dev/rsd0i: 2636.6MB in 5399712 sectors of 512 bytes
+14 cylinder groups of 202.31MB, 12948 blocks, 25920 inodes each
+/dev/rsd0e: 3905.8MB in 7999040 sectors of 512 bytes
+20 cylinder groups of 202.50MB, 12960 blocks, 25920 inodes each
+/dev/sd0a (d031cf3daccf3e05.a) on /mnt type ffs (rw, asynchronous, local)
+/dev/sd0k (d031cf3daccf3e05.k) on /mnt/home type ffs (rw, asynchronous, local, nodev, nosuid)
+/dev/sd0d (d031cf3daccf3e05.d) on /mnt/tmp type ffs (rw, asynchronous, local, nodev, nosuid)
+/dev/sd0f (d031cf3daccf3e05.f) on /mnt/usr type ffs (rw, asynchronous, local, nodev)
+/dev/sd0g (d031cf3daccf3e05.g) on /mnt/usr/X11R6 type ffs (rw, asynchronous, local, nodev)
+/dev/sd0h (d031cf3daccf3e05.h) on /mnt/usr/local type ffs (rw, asynchronous, local, nodev)
+/dev/sd0j (d031cf3daccf3e05.j) on /mnt/usr/obj type ffs (rw, asynchronous, local, nodev, nosuid)
+/dev/sd0i (d031cf3daccf3e05.i) on /mnt/usr/src type ffs (rw, asynchronous, local, nodev, nosuid)
+/dev/sd0e (d031cf3daccf3e05.e) on /mnt/var type ffs (rw, asynchronous, local, nodev, nosuid)
+
+Let's install the sets!
+Location of sets? (disk http nfs or 'done') [http] http
+HTTP proxy URL? (e.g. 'http://proxy:8080', or 'none') [none] none
+(Unable to get list from openbsd.org, but that is OK)
+HTTP Server? (hostname or 'done') 192.168.10.2
+Server directory? [pub/OpenBSD/7.6/amd64] OpenBSD/7.6/amd64/
+Unable to connect using HTTPS; using HTTP instead.
+
+Select sets by entering a set name, a file name pattern or 'all'. De-select
+sets by prepending a '-', e.g.: '-game*'. Selected sets are labelled '[X]'.
+    [X] bsd           [X] comp76.tgz    [X] xbase76.tgz   [X] xserv76.tgz
+    [X] bsd.rd        [X] man76.tgz     [X] xshare76.tgz
+    [X] base76.tgz    [X] game76.tgz    [X] xfont76.tgz
+Set name(s)? (or 'abort' or 'done') [done] -all bsd bsd.rd bsd.mp base76.tgz comp76.tgz man76.tgz game76.tgz done
+
+Get/Verify SHA256.sig     0% |                          |     0       --:-- ETA
+Get/Verify SHA256.sig   100% |**************************|  2324       00:00    
+Signature Verified
+
+Get/Verify bsd            0% |                          |     0       --:-- ETA
+Get/Verify bsd           10% |**                        |  2816 KB    00:09 ETA
+Get/Verify bsd           21% |*****                     |  6016 KB    00:07 ETA
+Get/Verify bsd           33% |********                  |  9344 KB    00:06 ETA
+Get/Verify bsd           45% |***********               | 12800 KB    00:04 ETA
+Get/Verify bsd           56% |**************            | 15744 KB    00:03 ETA
+Get/Verify bsd           67% |*****************         | 18944 KB    00:02 ETA
+Get/Verify bsd           78% |********************      | 22016 KB    00:01 ETA
+Get/Verify bsd           89% |***********************   | 25088 KB    00:00 ETA
+Get/Verify bsd          100% |**************************| 28007 KB    00:08    
+
+Get/Verify bsd.rd         0% |                          |     0       --:-- ETA
+Get/Verify bsd.rd        66% |*****************         |  3072 KB    00:00 ETA
+Get/Verify bsd.rd       100% |**************************|  4600 KB    00:01    
+
+Get/Verify base76.tgz     0% |                          |     0       --:-- ETA
+Get/Verify base76.tgz     0% |                          |  3072 KB    02:22 ETA
+Get/Verify base76.tgz     1% |                          |  6272 KB    02:15 ETA
+Get/Verify base76.tgz     2% |                          |  9728 KB    02:09 ETA
+Get/Verify base76.tgz     3% |                          | 13056 KB    02:06 ETA
+Get/Verify base76.tgz     3% |                          | 16640 KB    02:03 ETA
+Get/Verify base76.tgz     4% |*                         | 18944 KB    02:09 ETA
+Get/Verify base76.tgz     5% |*                         | 21760 KB    02:10 ETA
+Get/Verify base76.tgz     5% |*                         | 24576 KB    02:10 ETA
+Get/Verify base76.tgz     6% |*                         | 27904 KB    02:08 ETA
+Get/Verify base76.tgz     7% |*                         | 30848 KB    02:07 ETA
+Get/Verify base76.tgz     7% |*                         | 33792 KB    02:07 ETA
+Get/Verify base76.tgz     8% |**                        | 36864 KB    02:06 ETA
+Get/Verify base76.tgz     9% |**                        | 39936 KB    02:05 ETA
+Get/Verify base76.tgz    10% |**                        | 43008 KB    02:04 ETA
+Get/Verify base76.tgz    10% |**                        | 45824 KB    02:04 ETA
+Get/Verify base76.tgz    11% |**                        | 48640 KB    02:03 ETA
+Get/Verify base76.tgz    12% |***                       | 51840 KB    02:02 ETA
+Get/Verify base76.tgz    12% |***                       | 54784 KB    02:01 ETA
+Get/Verify base76.tgz    13% |***                       | 57984 KB    02:00 ETA
+Get/Verify base76.tgz    14% |***                       | 60800 KB    01:59 ETA
+Get/Verify base76.tgz    14% |***                       | 63488 KB    01:59 ETA
+Get/Verify base76.tgz    15% |***                       | 66432 KB    01:58 ETA
+Get/Verify base76.tgz    16% |****                      | 69632 KB    01:57 ETA
+Get/Verify base76.tgz    17% |****                      | 72192 KB    01:57 ETA
+Get/Verify base76.tgz    17% |****                      | 74368 KB    01:57 ETA
+Get/Verify base76.tgz    18% |****                      | 76672 KB    01:58 ETA
+Get/Verify base76.tgz    18% |****                      | 79744 KB    01:56 ETA
+Get/Verify base76.tgz    19% |****                      | 82688 KB    01:55 ETA
+Get/Verify base76.tgz    20% |*****                     | 85760 KB    01:54 ETA
+Get/Verify base76.tgz    20% |*****                     | 88704 KB    01:53 ETA
+Get/Verify base76.tgz    21% |*****                     | 91904 KB    01:52 ETA
+Get/Verify base76.tgz    22% |*****                     | 94848 KB    01:51 ETA
+Get/Verify base76.tgz    22% |*****                     | 95872 KB    01:53 ETA
+Get/Verify base76.tgz    22% |*****                     | 97152 KB    01:54 ETA
+Get/Verify base76.tgz    23% |*****                     | 98560 KB    01:55 ETA
+Get/Verify base76.tgz    23% |*****                     |    98 MB    01:55 ETA
+Get/Verify base76.tgz    24% |******                    |   101 MB    01:54 ETA
+Get/Verify base76.tgz    24% |******                    |   103 MB    01:54 ETA
+Get/Verify base76.tgz    25% |******                    |   105 MB    01:54 ETA
+Get/Verify base76.tgz    26% |******                    |   107 MB    01:53 ETA
+Get/Verify base76.tgz    26% |******                    |   110 MB    01:53 ETA
+Get/Verify base76.tgz    27% |*******                   |   112 MB    01:53 ETA
+Get/Verify base76.tgz    27% |*******                   |   114 MB    01:53 ETA
+Get/Verify base76.tgz    27% |*******                   |   115 MB    01:53 ETA
+Get/Verify base76.tgz    28% |*******                   |   117 MB    01:53 ETA
+Get/Verify base76.tgz    28% |*******                   |   119 MB    01:54 ETA
+Get/Verify base76.tgz    29% |*******                   |   121 MB    01:53 ETA
+Get/Verify base76.tgz    29% |*******                   |   123 MB    01:53 ETA
+Get/Verify base76.tgz    30% |*******                   |   125 MB    01:52 ETA
+Get/Verify base76.tgz    30% |*******                   |   127 MB    01:52 ETA
+Get/Verify base76.tgz    31% |********                  |   130 MB    01:51 ETA
+Get/Verify base76.tgz    31% |********                  |   132 MB    01:50 ETA
+Get/Verify base76.tgz    32% |********                  |   135 MB    01:49 ETA
+Get/Verify base76.tgz    33% |********                  |   137 MB    01:48 ETA
+Get/Verify base76.tgz    33% |********                  |   139 MB    01:48 ETA
+Get/Verify base76.tgz    34% |********                  |   142 MB    01:47 ETA
+Get/Verify base76.tgz    34% |********                  |   144 MB    01:46 ETA
+Get/Verify base76.tgz    35% |*********                 |   146 MB    01:46 ETA
+Get/Verify base76.tgz    35% |*********                 |   148 MB    01:45 ETA
+Get/Verify base76.tgz    36% |*********                 |   150 MB    01:44 ETA
+Get/Verify base76.tgz    36% |*********                 |   152 MB    01:44 ETA
+Get/Verify base76.tgz    37% |*********                 |   155 MB    01:43 ETA
+Get/Verify base76.tgz    37% |*********                 |   157 MB    01:43 ETA
+Get/Verify base76.tgz    38% |*********                 |   159 MB    01:42 ETA
+Get/Verify base76.tgz    39% |**********                |   161 MB    01:41 ETA
+Get/Verify base76.tgz    39% |**********                |   164 MB    01:40 ETA
+Get/Verify base76.tgz    40% |**********                |   166 MB    01:40 ETA
+Get/Verify base76.tgz    40% |**********                |   168 MB    01:39 ETA
+Get/Verify base76.tgz    41% |**********                |   170 MB    01:38 ETA
+Get/Verify base76.tgz    41% |**********                |   172 MB    01:37 ETA
+Get/Verify base76.tgz    42% |**********                |   175 MB    01:36 ETA
+Get/Verify base76.tgz    42% |**********                |   177 MB    01:36 ETA
+Get/Verify base76.tgz    43% |***********               |   179 MB    01:35 ETA
+Get/Verify base76.tgz    43% |***********               |   181 MB    01:35 ETA
+Get/Verify base76.tgz    44% |***********               |   183 MB    01:34 ETA
+Get/Verify base76.tgz    44% |***********               |   186 MB    01:33 ETA
+Get/Verify base76.tgz    45% |***********               |   188 MB    01:32 ETA
+Get/Verify base76.tgz    45% |***********               |   190 MB    01:31 ETA
+Get/Verify base76.tgz    46% |***********               |   192 MB    01:31 ETA
+Get/Verify base76.tgz    46% |***********               |   194 MB    01:30 ETA
+Get/Verify base76.tgz    47% |************              |   196 MB    01:29 ETA
+Get/Verify base76.tgz    48% |************              |   198 MB    01:28 ETA
+Get/Verify base76.tgz    48% |************              |   201 MB    01:28 ETA
+Get/Verify base76.tgz    49% |************              |   203 MB    01:27 ETA
+Get/Verify base76.tgz    49% |************              |   205 MB    01:26 ETA
+Get/Verify base76.tgz    50% |*************             |   207 MB    01:25 ETA
+Get/Verify base76.tgz    50% |*************             |   209 MB    01:24 ETA
+Get/Verify base76.tgz    51% |*************             |   212 MB    01:23 ETA
+Get/Verify base76.tgz    51% |*************             |   214 MB    01:23 ETA
+Get/Verify base76.tgz    52% |*************             |   216 MB    01:22 ETA
+Get/Verify base76.tgz    52% |*************             |   219 MB    01:21 ETA
+Get/Verify base76.tgz    53% |*************             |   221 MB    01:20 ETA
+Get/Verify base76.tgz    53% |*************             |   223 MB    01:19 ETA
+Get/Verify base76.tgz    54% |**************            |   225 MB    01:18 ETA
+Get/Verify base76.tgz    55% |**************            |   227 MB    01:17 ETA
+Get/Verify base76.tgz    55% |**************            |   230 MB    01:16 ETA
+Get/Verify base76.tgz    56% |**************            |   232 MB    01:15 ETA
+Get/Verify base76.tgz    56% |**************            |   234 MB    01:15 ETA
+Get/Verify base76.tgz    57% |**************            |   236 MB    01:14 ETA
+Get/Verify base76.tgz    57% |**************            |   239 MB    01:13 ETA
+Get/Verify base76.tgz    58% |***************           |   241 MB    01:12 ETA
+Get/Verify base76.tgz    58% |***************           |   243 MB    01:11 ETA
+Get/Verify base76.tgz    59% |***************           |   245 MB    01:10 ETA
+Get/Verify base76.tgz    59% |***************           |   248 MB    01:09 ETA
+Get/Verify base76.tgz    60% |***************           |   250 MB    01:08 ETA
+Get/Verify base76.tgz    61% |***************           |   252 MB    01:07 ETA
+Get/Verify base76.tgz    61% |***************           |   254 MB    01:06 ETA
+Get/Verify base76.tgz    62% |****************          |   257 MB    01:06 ETA
+Get/Verify base76.tgz    62% |****************          |   259 MB    01:05 ETA
+Get/Verify base76.tgz    63% |****************          |   261 MB    01:04 ETA
+Get/Verify base76.tgz    63% |****************          |   263 MB    01:03 ETA
+Get/Verify base76.tgz    64% |****************          |   266 MB    01:02 ETA
+Get/Verify base76.tgz    64% |****************          |   268 MB    01:01 ETA
+Get/Verify base76.tgz    65% |****************          |   270 MB    01:00 ETA
+Get/Verify base76.tgz    65% |****************          |   273 MB    00:59 ETA
+Get/Verify base76.tgz    66% |*****************         |   275 MB    00:58 ETA
+Get/Verify base76.tgz    67% |*****************         |   277 MB    00:57 ETA
+Get/Verify base76.tgz    67% |*****************         |   279 MB    00:56 ETA
+Get/Verify base76.tgz    68% |*****************         |   282 MB    00:55 ETA
+Get/Verify base76.tgz    68% |*****************         |   284 MB    00:54 ETA
+Get/Verify base76.tgz    69% |*****************         |   286 MB    00:53 ETA
+Get/Verify base76.tgz    69% |*****************         |   288 MB    00:53 ETA
+Get/Verify base76.tgz    70% |******************        |   291 MB    00:52 ETA
+Get/Verify base76.tgz    70% |******************        |   293 MB    00:51 ETA
+Get/Verify base76.tgz    71% |******************        |   295 MB    00:50 ETA
+Get/Verify base76.tgz    71% |******************        |   297 MB    00:49 ETA
+Get/Verify base76.tgz    72% |******************        |   300 MB    00:48 ETA
+Get/Verify base76.tgz    72% |******************        |   302 MB    00:47 ETA
+Get/Verify base76.tgz    73% |******************        |   304 MB    00:46 ETA
+Get/Verify base76.tgz    74% |*******************       |   306 MB    00:45 ETA
+Get/Verify base76.tgz    74% |*******************       |   308 MB    00:44 ETA
+Get/Verify base76.tgz    75% |*******************       |   311 MB    00:43 ETA
+Get/Verify base76.tgz    75% |*******************       |   313 MB    00:42 ETA
+Get/Verify base76.tgz    76% |*******************       |   315 MB    00:42 ETA
+Get/Verify base76.tgz    76% |*******************       |   317 MB    00:41 ETA
+Get/Verify base76.tgz    77% |********************      |   319 MB    00:40 ETA
+Get/Verify base76.tgz    77% |********************      |   321 MB    00:39 ETA
+Get/Verify base76.tgz    78% |********************      |   324 MB    00:38 ETA
+Get/Verify base76.tgz    78% |********************      |   326 MB    00:37 ETA
+Get/Verify base76.tgz    79% |********************      |   328 MB    00:36 ETA
+Get/Verify base76.tgz    79% |********************      |   330 MB    00:35 ETA
+Get/Verify base76.tgz    80% |********************      |   333 MB    00:34 ETA
+Get/Verify base76.tgz    80% |********************      |   335 MB    00:33 ETA
+Get/Verify base76.tgz    81% |*********************     |   337 MB    00:32 ETA
+Get/Verify base76.tgz    82% |*********************     |   339 MB    00:31 ETA
+Get/Verify base76.tgz    82% |*********************     |   342 MB    00:30 ETA
+Get/Verify base76.tgz    83% |*********************     |   344 MB    00:29 ETA
+Get/Verify base76.tgz    83% |*********************     |   346 MB    00:28 ETA
+Get/Verify base76.tgz    84% |*********************     |   349 MB    00:27 ETA
+Get/Verify base76.tgz    84% |*********************     |   351 MB    00:26 ETA
+Get/Verify base76.tgz    85% |**********************    |   353 MB    00:25 ETA
+Get/Verify base76.tgz    85% |**********************    |   355 MB    00:25 ETA
+Get/Verify base76.tgz    86% |**********************    |   358 MB    00:24 ETA
+Get/Verify base76.tgz    86% |**********************    |   360 MB    00:23 ETA
+Get/Verify base76.tgz    87% |**********************    |   362 MB    00:22 ETA
+Get/Verify base76.tgz    88% |**********************    |   364 MB    00:21 ETA
+Get/Verify base76.tgz    88% |**********************    |   367 MB    00:20 ETA
+Get/Verify base76.tgz    89% |***********************   |   369 MB    00:19 ETA
+Get/Verify base76.tgz    89% |***********************   |   372 MB    00:18 ETA
+Get/Verify base76.tgz    90% |***********************   |   374 MB    00:17 ETA
+Get/Verify base76.tgz    90% |***********************   |   376 MB    00:16 ETA
+Get/Verify base76.tgz    91% |***********************   |   378 MB    00:15 ETA
+Get/Verify base76.tgz    92% |***********************   |   381 MB    00:14 ETA
+Get/Verify base76.tgz    92% |***********************   |   383 MB    00:13 ETA
+Get/Verify base76.tgz    93% |************************  |   386 MB    00:12 ETA
+Get/Verify base76.tgz    93% |************************  |   388 MB    00:11 ETA
+Get/Verify base76.tgz    94% |************************  |   390 MB    00:09 ETA
+Get/Verify base76.tgz    94% |************************  |   393 MB    00:08 ETA
+Get/Verify base76.tgz    97% |************************* |   404 MB    00:03 ETA
+Get/Verify base76.tgz   100% |**************************|   414 MB    02:49    
+
+Get/Verify comp76.tgz     0% |                          |     0       --:-- ETA
+Get/Verify comp76.tgz    16% |****                      | 13184 KB    00:05 ETA
+Get/Verify comp76.tgz    22% |*****                     | 18560 KB    00:06 ETA
+Get/Verify comp76.tgz    25% |******                    | 21120 KB    00:08 ETA
+Get/Verify comp76.tgz    28% |*******                   | 23552 KB    00:09 ETA
+Get/Verify comp76.tgz    31% |********                  | 25984 KB    00:10 ETA
+Get/Verify comp76.tgz    35% |*********                 | 28672 KB    00:11 ETA
+Get/Verify comp76.tgz    38% |*********                 | 31104 KB    00:11 ETA
+Get/Verify comp76.tgz    41% |**********                | 33664 KB    00:11 ETA
+Get/Verify comp76.tgz    44% |***********               | 36096 KB    00:11 ETA
+Get/Verify comp76.tgz    47% |************              | 38528 KB    00:11 ETA
+Get/Verify comp76.tgz    50% |*************             | 41088 KB    00:10 ETA
+Get/Verify comp76.tgz    53% |*************             | 43648 KB    00:10 ETA
+Get/Verify comp76.tgz    56% |**************            | 46208 KB    00:09 ETA
+Get/Verify comp76.tgz    59% |***************           | 48640 KB    00:09 ETA
+Get/Verify comp76.tgz    62% |****************          | 51072 KB    00:08 ETA
+Get/Verify comp76.tgz    65% |****************          | 53504 KB    00:08 ETA
+Get/Verify comp76.tgz    68% |*****************         | 56064 KB    00:07 ETA
+Get/Verify comp76.tgz    71% |******************        | 58368 KB    00:07 ETA
+Get/Verify comp76.tgz    74% |*******************       | 60800 KB    00:06 ETA
+Get/Verify comp76.tgz    78% |********************      | 63616 KB    00:05 ETA
+Get/Verify comp76.tgz    80% |********************      | 65920 KB    00:04 ETA
+Get/Verify comp76.tgz    83% |*********************     | 68224 KB    00:04 ETA
+Get/Verify comp76.tgz    86% |**********************    | 70656 KB    00:03 ETA
+Get/Verify comp76.tgz    89% |***********************   | 73088 KB    00:02 ETA
+Get/Verify comp76.tgz    92% |***********************   | 75520 KB    00:01 ETA
+Get/Verify comp76.tgz    95% |************************  | 78080 KB    00:01 ETA
+Get/Verify comp76.tgz    98% |************************* | 80512 KB    00:00 ETA
+Get/Verify comp76.tgz   100% |**************************| 81512 KB    00:27    
+
+Get/Verify man76.tgz      0% |                          |     0       --:-- ETA
+Get/Verify man76.tgz     25% |******                    |  2048 KB    00:02 ETA
+Get/Verify man76.tgz     39% |**********                |  3200 KB    00:03 ETA
+Get/Verify man76.tgz     62% |****************          |  4992 KB    00:01 ETA
+Get/Verify man76.tgz     68% |*****************         |  5504 KB    00:01 ETA
+Get/Verify man76.tgz     82% |*********************     |  6656 KB    00:01 ETA
+Get/Verify man76.tgz     95% |************************  |  7680 KB    00:00 ETA
+Get/Verify man76.tgz    100% |**************************|  8039 KB    00:06    
+
+Get/Verify game76.tgz     0% |                          |     0       --:-- ETA
+Get/Verify game76.tgz    32% |********                  |   896 KB    00:02 ETA
+Get/Verify game76.tgz   100% |**************************|  2746 KB    00:01    
+
+Get/Verify BUILDINFO      0% |                          |     0       --:-- ETA
+Get/Verify BUILDINFO    100% |**************************|    54       00:00    
+
+Installing bsd            0% |                          |     0       --:-- ETA
+Installing bsd          100% |**************************| 28007 KB    00:00    
+
+Installing bsd.rd         0% |                          |     0       --:-- ETA
+Installing bsd.rd       100% |**************************|  4600 KB    00:00    
+
+Installing base76.tgz     0% |                          |     0       --:-- ETA
+Installing base76.tgz   100% |**************************|   414 MB    00:00    
+
+Extracting etc.tgz        0% |                          |     0       --:-- ETA
+Extracting etc.tgz      100% |**************************|   264 KB    00:00    
+
+Installing comp76.tgz     0% |                          |     0       --:-- ETA
+Installing comp76.tgz   100% |**************************| 81512 KB    00:00    
+
+Installing man76.tgz      0% |                          |     0       --:-- ETA
+Installing man76.tgz    100% |**************************|  8039 KB    00:00    
+
+Installing game76.tgz     0% |                          |     0       --:-- ETA
+Installing game76.tgz   100% |**************************|  2746 KB    00:00    
+
+Installing BUILDINFO      0% |                          |     0       --:-- ETA
+Installing BUILDINFO    100% |**************************|    54       00:00    
+Location of sets? (disk http nfs or 'done') [done] done
+
+What timezone are you in? ('?' for list) [Canada/Mountain] UTC
+Saving configuration files... done.
+Making all device nodes... done.
+# Note from Tancredi-Paul Grozav (not OpenBSD): The following lines are not
+# printed on serial(even if set in boot.conf), they are only printed on the
+# normal video output:
+fw_update: failed.
+Cannot fetch http://firmware.openbsd.org/firmware/7.6/SHA256.sig (timed out)
+Relinking to create unique kernel... done.
+
+CONGRATULATIONS! Your OpenBSD installation has been successfully completed!
+
+When you login to your new system the first time, please read your mail using the ’mail’ command.
+
+syncing disks... done
+rebooting...

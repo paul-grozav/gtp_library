@@ -48,6 +48,9 @@ label freedos_iso_tftp
 
 label aleph
   kernel http://192.168.10.2/aleph.krnl
+  # See kernel parameters:
+  # https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/
+  #   kernel-parameters.txt
 #  append ifname=eth0:08:00:27:6c:7d:05 ifname=eth1:08:00:27:00:00:03 ip=::::aleph-pxe:eth1:dhcp initrd=http://192.168.10.2/aleph.ird console=ttyS0 console=tty0 rooturl=http://192.168.10.2/aleph.sfs config_srv_url=http://192.168.10.2/aleph_config boot=pxe maxTryCount=10
 #  append ip=dhcp interface=enp0s8 initrd=http://192.168.10.2/aleph.ird console=ttyS0 console=tty0 rooturl=http://192.168.10.2/aleph.sfs config_srv_url=http://192.168.10.2/aleph_config boot=pxe maxTryCount=10
   append ip=:::::enp0s8:dhcp initrd=http://192.168.10.2/aleph.ird console=ttyS0 console=tty0 rooturl=http://192.168.10.2/aleph.sfs config_srv_url=http://192.168.10.2/aleph_config boot=pxe maxTryCount=10

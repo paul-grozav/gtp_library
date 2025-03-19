@@ -11,6 +11,8 @@ say   tcl_tftp - Tiny Core Linux (TFTP)
 say Default boot option is: tcl_http
 say Waiting 10 seconds for you to select an option...
 
+include pxelinux.cfg/common_included
+
 # Enable logging to serial
 serial 0 115200
 

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application creationComplete="init()"
+xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx" viewSourceURL="srcview/index.html">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			private var fr:FileReference;
+			
+			private function init():void{
+				fr = new FileReference();
+				fr.addEventListener(ProgressEvent.PROGRESS, progress);
+				fr.addEventListener(Event.SELECT, select);
+				fr.addEventListener(Event.COMPLETE, loadComplete);
+			}
+			
+			private function load():void{
+				fr.browse();
+			}
+			
+			private function progress(evt:ProgressEvent):void{
+				pb.setProgress(evt.bytesLoaded, evt.bytesTotal);
+			}
+			
+			private function save():void{
+				fr.save(txt.text, fileName.text);
+			}
+			
+			private function select(evt:Event):void{
+				fr.load();
+			}
+			
+			private function loadComplete(evt:Event):void{
+				txt.text = fr.data.readUTFBytes(fr.data.length);
+				fileName.text = fr.name;
+				
+//				Alert.show(String(fr.data));
+//				img.load(fr.data);
+			}
+			
+		]]>
+	</fx:Script>
+	<s:VGroup left="10" right="10" top="10" bottom="10">
+		<s:HGroup verticalAlign="middle">
+			<s:Button label="Load File" click="load()"/>
+			<s:Button label="Save File" click="save()"/>
+			<s:Label text="file name:"/>
+			<s:TextInput id="fileName"/>
+		</s:HGroup>
+		<mx:ProgressBar id="pb" mode="manual" />
+		<s:RichEditableText id="txt" width="100%" height="100%"/>
+	</s:VGroup>
+	
+</s:Application>

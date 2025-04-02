@@ -1,0 +1,62 @@
+# ============================================================================ #
+# Author: Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+# Install minikube kubernetes locally on the devel machine:
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb &&
+sudo dpkg -i minikube_latest_amd64.deb &&
+rm minikube_latest_amd64.deb
+
+paul@server:/data$ minikube start
+😄  minikube v1.23.2 on Ubuntu 21.10
+✨  Automatically selected the kvm2 driver. Other choices: virtualbox, ssh
+💾  Downloading driver docker-machine-driver-kvm2:
+    > docker-machine-driver-kvm2....: 65 B / 65 B [----------] 100.00% ? p/s 0s
+    > docker-machine-driver-kvm2: 11.40 MiB / 11.40 MiB  100.00% 4.10 MiB p/s 3
+💿  Downloading VM boot image ...
+    > minikube-v1.23.1.iso.sha256: 65 B / 65 B [-------------] 100.00% ? p/s 0s
+    > minikube-v1.23.1.iso: 225.22 MiB / 225.22 MiB [] 100.00% 3.95 MiB p/s 57s
+👍  Starting control plane node minikube in cluster minikube
+💾  Downloading Kubernetes v1.22.2 preload ...
+    > preloaded-images-k8s-v13-v1...: 511.69 MiB / 511.69 MiB  100.00% 3.89 MiB
+🔥  Creating kvm2 VM (CPUs=2, Memory=3900MB, Disk=20000MB) ...
+🐳  Preparing Kubernetes v1.22.2 on Docker 20.10.8 ...
+    ▪ Generating certificates and keys ...
+    ▪ Booting up control plane ...
+    ▪ Configuring RBAC rules ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+🌟  Enabled addons: storage-provisioner, default-storageclass
+💡  kubectl not found. If you need it, try: 'minikube kubectl -- get pods -A'
+🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
+
+paul@server:/data$ minikube kubectl -- get pods -A
+    > kubectl.sha256: 64 B / 64 B [--------------------------] 100.00% ? p/s 0s
+    > kubectl: 44.73 MiB / 44.73 MiB [---------------] 100.00% 4.17 MiB p/s 11s
+NAMESPACE     NAME                               READY   STATUS    RESTARTS   AGE
+kube-system   coredns-78fcd69978-444hm           0/1     Running   0          22s
+kube-system   etcd-minikube                      1/1     Running   0          34s
+kube-system   kube-apiserver-minikube            1/1     Running   0          36s
+kube-system   kube-controller-manager-minikube   1/1     Running   0          34s
+kube-system   kube-proxy-rrsws                   1/1     Running   0          23s
+kube-system   kube-scheduler-minikube            1/1     Running   0          34s
+kube-system   storage-provisioner                1/1     Running   0          34s
+
+paul@server:/data$ echo "alias kubectl=\"minikube kubectl --\"" >> ${HOME}/.bashrc && . ${HOME}/.bashrc
+
+paul@server:/data$ minikube dashboard --url
+🔌  Enabling dashboard ...
+    ▪ Using image kubernetesui/dashboard:v2.3.1
+    ▪ Using image kubernetesui/metrics-scraper:v1.0.7
+🤔  Verifying dashboard health ...
+🚀  Launching proxy ...
+🤔  Verifying proxy health ...
+http://127.0.0.1:40469/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/
+
+Press Ctrl+C To stop the dashboard
+
+paul@server:/data$ minikube service --url pg-nginx-pod-service
+http://192.168.39.190:30001
+
+# Enable ingress and ingress DNS: https://minikube.sigs.k8s.io/docs/handbook/addons/ingress-dns/
+
+# ============================================================================ #

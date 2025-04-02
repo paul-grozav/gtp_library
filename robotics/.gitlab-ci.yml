@@ -1,0 +1,26 @@
+image: gcc
+
+before_script: 
+  - apt update && apt -y install make cmake
+
+build:
+  stage: build
+  script: 
+    - cd robotics/hardware
+    - mkdir build
+    - cd build
+    - cmake .. -Dbuild_demo=ON -Dbuild_unit_tests=ON
+    - make
+  artifacts:
+    paths:
+      - robotics/hardware/build/unit_tests
+    expire_in: 1 hour
+  cache:
+    paths:
+      - "robotics/hardware/build/dependencies"
+
+# run tests using the binary built before
+test:
+  stage: test
+  script:
+    - robotics/hardware/build/unit_tests

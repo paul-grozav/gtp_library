@@ -1,0 +1,120 @@
+# ============================================================================ #
+# Author: Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+# Create deployment using command:
+# kubectl apply -f ./pg-nginx-pod.yaml
+# Undo/delete effects of this file:
+# kubectl delete pv pg-pv1 ; kubectl delete service pg-nginx-pod-service ; kubectl delete deployment pg-nginx-pod
+# Connect to it on host:port = master_ip:30001
+# ============================================================================ #
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-nginx-pod-service
+spec:
+  selector:
+    app: pg-nginx-pod
+  ports:
+    - protocol: TCP
+      port: 80
+      nodePort: 30001
+  type: NodePort
+# ============================================================================ #
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  1;
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+    events {
+      worker_connections  1024;
+    }
+    http {
+      add_header Author Tancredi_Paul_Grozav;
+      #include       /etc/nginx/mime.types;
+      default_type  application/octet-stream;
+      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+      access_log  /var/log/nginx/access.log  main;
+      sendfile        on;
+      #tcp_nopush     on;
+      keepalive_timeout  65;
+      #gzip  on;
+      include /etc/nginx/conf.d/*.conf;
+      server {
+        listen       80;
+        server_name  localhost;
+        location / {
+          root   /usr/share/nginx/html;
+          index  index.html index.htm;
+        }
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+          root   /usr/share/nginx/html;
+        }
+      }
+    }
+
+# ============================================================================ #
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-nginx-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pg-nginx-pod
+  template:
+    metadata:
+      labels:
+        app: pg-nginx-pod
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: DEMO_GREETING
+          value: "Hello from the environment"
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "(echo \"<hr/>Hello from Paul Grozav, in the postStart handler <pre>\" ; cat /etc/nginx/nginx.conf ; echo \"</pre>\") >> /usr/share/nginx/html/index.html"]
+
+#        volumeMounts:
+#        - name: pg-pv1
+#          mountPath: /usr/share/nginx/html
+#        command: ["bash"]
+#        args: ["-c", "\"date >> /usr/share/nginx/html/index.html\""]
+#        args: ["-c", "date"]
+#      volumes:
+#      - name: pg-pv1
+#        emptyDir: {}
+#####
+        volumeMounts:
+        - mountPath: /etc/nginx # mount nginx-conf volumn to /etc/nginx
+          readOnly: true
+          name: nginx-conf
+#        - mountPath: /var/log/nginx
+#          name: log
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf # place ConfigMap `nginx-conf` on /etc/nginx
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+#            - key: virtualhost.conf
+#              path: virtualhost/virtualhost.conf # dig directory
+#      - name: log
+#        emptyDir: {}
+# ============================================================================ #

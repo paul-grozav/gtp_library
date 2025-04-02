@@ -1,0 +1,27 @@
+// -------------------------------------------------------------------------- //
+// Author: Tancredi-Paul Grozav <paul@grozav.info>
+// -------------------------------------------------------------------------- //
+syntax = "proto3";
+
+package info.grozav.paul;
+
+// The greeting service definition.
+service greeter
+{
+  // Sends a greeting
+  rpc say_hello (hello_request) returns (hello_reply) {}
+}
+
+// The request message containing the user's name.
+message hello_request
+{
+  string name = 1;
+}
+
+// The response message containing the greetings
+message hello_reply
+{
+  string message = 1;
+}
+// -------------------------------------------------------------------------- //
+

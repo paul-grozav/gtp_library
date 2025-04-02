@@ -1,0 +1,75 @@
+# ============================================================================ #
+# Author: Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+# Volatile storage prometheus in kubernetes
+# ============================================================================ #
+# Create deployment using command:
+# kubectl apply -f ./pg-monitor-pod.yaml
+# Undo/delete effects of this file:
+# kubectl delete pv pg-pv1 ; kubectl delete service pg-monitor-pod-service ; kubectl delete deployment pg-monitor-pod ; kubectl delete configmap pg-monitor-prometheus-conf
+# ============================================================================ #
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-monitor-pod-service
+spec:
+  selector:
+    app: pg-monitor-pod
+  ports:
+    - protocol: TCP
+      port: 9090
+      nodePort: 30002
+  type: NodePort
+# ============================================================================ #
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-monitor-prometheus-conf
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+      scrape_timeout: 1s
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+      - job_name: 'ci1'
+        scrape_interval: 1s
+        static_configs:
+          - targets: ['192.168.2.114:9100','192.168.2.114:9101']
+
+# ============================================================================ #
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-monitor-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pg-monitor-pod
+  template:
+    metadata:
+      labels:
+        app: pg-monitor-pod
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus:v2.14.0
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - mountPath: /etc/prometheus # mount nginx-conf volumn to /etc/nginx
+          readOnly: true
+          name: pg-monitor-prometheus-conf
+      volumes:
+      - name: pg-monitor-prometheus-conf
+        configMap:
+          name: pg-monitor-prometheus-conf # place ConfigMap
+          items:
+            - key: prometheus.yml
+              path: prometheus.yml
+# ============================================================================ #

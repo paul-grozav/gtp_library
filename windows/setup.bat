@@ -2,6 +2,11 @@
 :: Authors:
 :: - Tancredi-Paul Grozav <paul@grozav.info>
 :: ========================================================================== ::
+:: # Recovery - set reboot in safemode
+:: C:\windows\system32\bcdedit /set {default} safeboot minimal
+:: # Remove set reboot in safemode
+:: bcdedit /deletevalue {default} safeboot
+:: ========================================================================== ::
 :: @echo off
 set timeout_duration=5
 :: ========================================================================== ::

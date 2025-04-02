@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application creationComplete="init()"
+xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx" viewSourceURL="srcview/index.html">
+	<fx:Script>
+		<![CDATA[
+			import grozav.paul.net.stratus.StratusConnection;
+			import grozav.paul.net.stratus.StratusEvent;
+			import grozav.paul.net.stratus.StratusPeerEvent;
+			import grozav.paul.net.stratus.StratusSendStream;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			
+			private const DEVELOPER_KEY:String = "afc442ca241e650d4e0a4f2d-245667442028";
+			
+			private var stratusConnection:StratusConnection;
+			private var sendStream:StratusSendStream;
+			[Bindable]private var recvStream:NetStream;
+			
+			private var fr:FileReference;
+			
+			private function init():void{
+				//connect to Adobe Stratus
+				stratusConnection = new StratusConnection();
+				stratusConnection.addEventListener(StratusEvent.CONNECTED_TO_SERVER, connectedToStratus);
+				stratusConnection.addEventListener(StratusEvent.CONNECTION_FAILED, function h():void{print("CONNECTION FAILED");});
+				stratusConnection.addEventListener(StratusEvent.CONNECTION_CLOSED, function h():void{print("CONNECTION CLOSED");});
+				stratusConnection.addEventListener(StratusPeerEvent.PEER_CONNECTED, function h():void{print("A PEER CONNECTED TO A STREAM")});
+				stratusConnection.addEventListener(StratusPeerEvent.PEER_DISCONNECTED, function h():void{print("A PEER DISCONNECTED FROM A STREAM")});
+				stratusConnection.connect(DEVELOPER_KEY);
+				print("CONNECTING...");
+				
+				newFR();
+			}
+				
+			private function newFR():void{
+				//create the File Reference object
+				fr = new FileReference();
+				fr.addEventListener(ProgressEvent.PROGRESS, function h(e:ProgressEvent):void{print("Loading from disk..."+Math.ceil(e.bytesLoaded/e.bytesTotal*100)+"%")});
+				fr.addEventListener(Event.SELECT, function h():void{fr.load()});
+				fr.addEventListener(Event.COMPLETE, sendFileToPeer);
+			}
+			
+			private function sendFileToPeer(evt:Event):void{
+				sendStream.send("receiveFile", fr.data);
+				print((fr.data.length)+" BYTES SENT");
+				newFR();
+			}
+			
+			private function connectedToStratus(evt:StratusEvent):void{
+				print("CONNECTED TO STRATUS");
+				myId.text = stratusConnection.myId;
+			
+				//create the send stream
+				//So anyone can connect to me to receive my time
+				sendStream = new StratusSendStream(stratusConnection, function h():Boolean{return true});//accept any peer to connect to this stream
+				sendStream.publishStream("fileStream");
+			}
+			
+			private function connectToPeer():void{
+				//create the receive stream
+				recvStream = new NetStream(stratusConnection.connection, peerId.text);
+				recvStream.play("fileStream");//the stream published by the other peer
+				recvStream.client = this;
+				print("RECEIVING FILE FROM "+peerId.text);
+			}
+			
+			//this function is going to be called by another peer when he sends me the file
+			//this function has to be public
+			public function receiveFile(data:ByteArray):void{
+				print("RECEIVED A FILE OF "+(data.length)+" BYTES");
+				Alert.show("Do you want to save the file?", "Save file", 3, this, function alertClickHandler(evt:CloseEvent):void{
+					if(evt.detail == Alert.YES){
+						var saveFR:FileReference = new FileReference();
+						saveFR.save(data);
+					}
+				});
+//				print(data.readUTFBytes(data.length));
+			}
+			
+			private function print(data:String):void{
+				if(console.text.length > 0)
+					console.text += "\n";
+				console.text += data;
+			}
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%">
+		
+		<s:HGroup>
+			<s:Label text="My Stratus ID:" />
+			<mx:Text id="myId" />
+		</s:HGroup>
+		
+		<s:HGroup>
+			<s:Label text="Connect to peer:" />
+			<s:TextInput id="peerId" />
+			<s:Button label="Connect - Get File" click="connectToPeer()" />
+		</s:HGroup>
+		
+		<s:HGroup>
+			<s:Label text="Select a file to send to peer" />
+			<s:Button label="Send a FILE" click="fr.browse()" />
+		</s:HGroup>
+		
+		<s:TextArea id="console" width="100%" height="100%" />
+		
+	</s:VGroup>
+</s:Application>

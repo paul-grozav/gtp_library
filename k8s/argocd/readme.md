@@ -13,7 +13,8 @@ kubectl -n argocd port-forward service/argocd-server 443:1443 &&
 # Open https://localhost:1443/ and login with user admin and the password above.
 ```
 
-Apply the [manifests](./manifests_app.yaml) app:
+Apply the [bootstrap](./bootstrap_app.yaml) app:
 ```sh
-kubectl apply -f ./manifests_app.yaml
+kubectl apply -f ./bootstrap_app.yaml
 ```
+That will install the other ArgoCD apps, K8s manifests and Helm charts.

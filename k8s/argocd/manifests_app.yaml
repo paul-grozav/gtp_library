@@ -6,7 +6,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app_one
+  name: app-one
   # This should be the NS where ArgoCD is running
   namespace: argocd
 spec:
@@ -14,8 +14,9 @@ spec:
     # Keep this value for the cluster ArgoCD is running in
     server: https://kubernetes.default.svc
     # Namespace where we want to install our application
-    namespace: app_1_ns
-  project: my-project
+    namespace: app-one-ns
+  # This default project is created at ArgoCD install time. Useful for RBAC
+  project: default
   source:
     # repoURL: https://github.com/argoproj/argocd-example-apps
     # targetRevision: HEAD

@@ -2,34 +2,34 @@
 # Authors:
 # - Tancredi-Paul Grozav <paul@grozav.info>
 # ============================================================================ #
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: my-helm-app
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/paul-grozav/gtp_library
-    targetRevision: main
-    path: k8s/argocd/helm_charts/app_two
-    helm:
-      valueFiles:
-      - values.yaml
-      parameters:
-      - name: replicaCount
-        # These values need to be strings
-        value: "7"
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: app-two
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: my-helm-app
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://github.com/paul-grozav/gtp_library
+#     targetRevision: main
+#     path: k8s/argocd/helm_charts/app_two
+#     helm:
+#       valueFiles:
+#       - values.yaml
+#       parameters:
+#       - name: replicaCount
+#         # These values need to be strings
+#         value: "7"
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: app-two
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#     - CreateNamespace=true
 # ============================================================================ #
 # Add a public chart too
 ---

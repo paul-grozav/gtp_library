@@ -11,6 +11,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
+    # Keep this value for the cluster ArgoCD is running in
     server: https://kubernetes.default.svc
     # Namespace where we want to install our application
     namespace: app_1_ns
@@ -26,4 +27,7 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+    # Create the target namespace if it doesn't exist
+    - CreateNamespace=true
 # ============================================================================ #

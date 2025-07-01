@@ -1,0 +1,27 @@
+# ============================================================================ #
+# Authors:
+# - Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: guestbook
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  project: default
+  source:
+    # repoURL: https://github.com/argoproj/argocd-example-apps
+    # targetRevision: HEAD
+    # path: guestbook
+    repoURL: https://github.com/paul-grozav/gtp_library
+    targetRevision: main
+    path: k8s/argocd/manifests
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+# ============================================================================ #

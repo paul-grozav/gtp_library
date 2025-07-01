@@ -1,0 +1,59 @@
+# ============================================================================ #
+# Author: Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-nginx-pod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pg-nginx-pod
+  template:
+    metadata:
+      labels:
+        app: pg-nginx-pod
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: DEMO_GREETING
+          value: "Hello from the environment"
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "(echo \"<hr/>Hello from Paul Grozav, in the postStart handler <pre>\" ; cat /etc/nginx/nginx.conf ; echo \"</pre>\") >> /usr/share/nginx/html/index.html"]
+
+#        volumeMounts:
+#        - name: pg-pv1
+#          mountPath: /usr/share/nginx/html
+#        command: ["bash"]
+#        args: ["-c", "\"date >> /usr/share/nginx/html/index.html\""]
+#        args: ["-c", "date"]
+#      volumes:
+#      - name: pg-pv1
+#        emptyDir: {}
+#####
+        volumeMounts:
+        - mountPath: /etc/nginx # mount nginx-conf volumn to /etc/nginx
+          readOnly: true
+          name: nginx-conf
+#        - mountPath: /var/log/nginx
+#          name: log
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf # place ConfigMap `nginx-conf` on /etc/nginx
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+#            - key: virtualhost.conf
+#              path: virtualhost/virtualhost.conf # dig directory
+#      - name: log
+#        emptyDir: {}
+# ============================================================================ #

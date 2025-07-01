@@ -1,0 +1,16 @@
+# ============================================================================ #
+# Author: Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-nginx-pod-service
+spec:
+  selector:
+    app: pg-nginx-pod
+  ports:
+    - protocol: TCP
+      port: 80
+      nodePort: 30001
+  type: NodePort
+# ============================================================================ #

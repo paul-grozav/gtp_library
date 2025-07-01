@@ -8,7 +8,7 @@ kind: Application
 metadata:
   name: app-one
   # This should be the NS where ArgoCD is running
-  namespace: apps-argocd
+  namespace: argocd
 spec:
   destination:
     # Keep this value for the cluster ArgoCD is running in

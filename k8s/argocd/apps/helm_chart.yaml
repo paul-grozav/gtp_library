@@ -1,0 +1,37 @@
+# ============================================================================ #
+# Authors:
+# - Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-helm-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/paul-grozav/gtp_library
+    targetRevision: main
+    path: k8s/argocd/helm_charts
+    helm:
+      valueFiles:
+      # Default values file
+      - values.yaml
+      # Override with environment-specific values
+      # - environments/production-values.yaml
+      parameters:
+      - name: "replicaCount"
+        value: "3"
+      - name: "image.tag"
+        value: "v1.2.3"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: app-two
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+# ============================================================================ #

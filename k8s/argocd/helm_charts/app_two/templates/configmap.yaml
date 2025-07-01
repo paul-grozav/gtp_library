@@ -9,5 +9,5 @@ metadata:
   name: paul-conf
 data:
   paul.conf: |
-    This is just a test file
+    This is just a test file {{ .Values.replicaCount }}
 # ============================================================================ #

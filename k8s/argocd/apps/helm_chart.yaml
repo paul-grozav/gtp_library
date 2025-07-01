@@ -21,10 +21,8 @@ spec:
       # Override with environment-specific values
       # - environments/production-values.yaml
       parameters:
-      - name: "replicaCount"
-        value: "3"
-      - name: "image.tag"
-        value: "v1.2.3"
+      - name: replicaCount
+        value: 3
   destination:
     server: https://kubernetes.default.svc
     namespace: app-two

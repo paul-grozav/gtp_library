@@ -31,3 +31,37 @@ spec:
     syncOptions:
     - CreateNamespace=true
 # ============================================================================ #
+# Add a public chart too
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-nginx-webserver
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 20.1.0
+    chart: nginx
+    helm:
+      values: |
+        image:
+          # Specific Nginx image tag
+          tag: 1.29.0-alpine3.22-slim
+        replicaCount: 1
+        service:
+          type: ClusterIP
+          port: 80
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: my-nginx-webserver
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+# ============================================================================ #

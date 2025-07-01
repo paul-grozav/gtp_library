@@ -19,7 +19,7 @@ spec:
       - values.yaml
       parameters:
       - name: replicaCount
-        value: 4
+        value: "5"
   destination:
     server: https://kubernetes.default.svc
     namespace: app-two

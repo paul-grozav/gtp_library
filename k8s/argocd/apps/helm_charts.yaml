@@ -20,7 +20,7 @@ spec:
       parameters:
       - name: replicaCount
         # These values need to be strings
-        value: "6"
+        value: "7"
   destination:
     server: https://kubernetes.default.svc
     namespace: app-two

@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/paul-grozav/gtp_library
     targetRevision: main
-    path: k8s/argocd/helm_charts
+    path: k8s/argocd/helm_charts/app_two
     helm:
       valueFiles:
       # Default values file

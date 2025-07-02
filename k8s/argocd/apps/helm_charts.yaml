@@ -85,8 +85,6 @@ spec:
       values: |
         loadBalancer:
           enabled: false
-        # nodePort:
-        #   enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: kubeview

@@ -53,6 +53,7 @@ spec:
         service:
           type: ClusterIP
           port: 80
+        resources: {}
   destination:
     server: https://kubernetes.default.svc
     namespace: my-nginx-webserver

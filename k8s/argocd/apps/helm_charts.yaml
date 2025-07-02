@@ -43,7 +43,9 @@ spec:
   project: default
   source:
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 20.1.0
+    # "*" will track the latest STABLE version
+    # "*-0" tracks latest, including pre-releases
+    targetRevision: "*"
     chart: nginx
     helm:
       values: |
@@ -79,7 +81,7 @@ spec:
   project: default
   source:
     repoURL: https://code.benco.io/kubeview/deploy/helm
-    targetRevision: 2.0.3
+    targetRevision: "*"
     chart: kubeview
     helm:
       values: |
@@ -108,7 +110,7 @@ spec:
   project: default
   source:
     repoURL: https://kubernetes.github.io/dashboard
-    targetRevision: 7.13.0
+    targetRevision: "*"
     chart: kubernetes-dashboard
     helm:
       values: |

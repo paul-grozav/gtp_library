@@ -48,7 +48,7 @@ spec:
       values: |
         image:
           # Specific Nginx image tag
-          tag: 1.29.0-alpine3.22-slim
+          tag: 21.0.3
         replicaCount: 1
         service:
           type: ClusterIP

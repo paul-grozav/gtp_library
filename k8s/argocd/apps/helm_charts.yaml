@@ -2,6 +2,7 @@
 # Authors:
 # - Tancredi-Paul Grozav <paul@grozav.info>
 # ============================================================================ #
+# A local helm chart, from this repo
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -31,7 +32,7 @@ spec:
     syncOptions:
     - CreateNamespace=true
 # ============================================================================ #
-# Add a public chart too
+# Nginx - a public helm chart pulled from their repo
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -58,6 +59,37 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: my-nginx-webserver
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+# ============================================================================ #
+# KubeView - A read-only visual diagram of K8s objects
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-nginx-webserver
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://code.benco.io/kubeview/deploy/helm
+    targetRevision: 2.0.3
+    chart: kubeview
+    helm:
+      values: |
+        image:
+          # Specific Nginx image tag
+          tag: 1.29.0-debian-12-r2
+        replicaCount: 1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubeview
   syncPolicy:
     automated:
       prune: true

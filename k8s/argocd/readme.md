@@ -2,10 +2,14 @@ Install [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) using:
 
 ```sh
 # Install
-kubectl create namespace argocd &&
 # kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml &&
 helm repo add argo https://argoproj.github.io/argo-helm &&
-helm install argocd argo/argo-cd --namespace argocd &&
+helm install argocd \
+  argo/argo-cd \
+  --create-namespace \
+  --namespace argocd \
+  --set configs.params."application\.namespaces"=* \
+  &&
 
 # Get administrative password:
 kubectl -n argocd get secret argocd-initial-admin-secret \

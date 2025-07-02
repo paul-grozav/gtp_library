@@ -83,10 +83,10 @@ spec:
     chart: kubeview
     helm:
       values: |
-        image:
-          # Specific Nginx image tag
-          tag: 1.29.0-debian-12-r2
-        replicaCount: 1
+        # image:
+        #   # Specific Nginx image tag
+        #   tag: 1.29.0-debian-12-r2
+        # replicaCount: 1
   destination:
     server: https://kubernetes.default.svc
     namespace: kubeview

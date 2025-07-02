@@ -98,3 +98,33 @@ spec:
     - ApplyOutOfSyncOnly=true
     - ServerSideApply=true
 # ============================================================================ #
+# Kubernetes Dashboard - The official web dashboard for K8s
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-dashboard
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://kubernetes.github.io/dashboard
+    targetRevision: 7.13.0
+    chart: kubernetes-dashboard
+    helm:
+      values: |
+        # image:
+        #   tag: 1.29.0-debian-12-r2
+        # replicaCount: 1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubernetes-dashboard
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+# ============================================================================ #

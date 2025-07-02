@@ -73,7 +73,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: my-nginx-webserver
+  name: kubeview
   namespace: argocd
 spec:
   project: default

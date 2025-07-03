@@ -2,6 +2,8 @@
 
 https://github.com/microsoft/azurelinux
 
+[Download ISO](https://aka.ms/azurelinux-3.0-x86_64.iso)
+
 ```sh
 wsl.exe --system --user root
 root@PAULW11 [ / ]# ls -la

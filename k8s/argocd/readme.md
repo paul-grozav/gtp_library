@@ -24,3 +24,11 @@ Apply the [bootstrap](./bootstrap_app.yaml) app:
 kubectl apply -f ./bootstrap_app.yaml
 ```
 That will install the other ArgoCD apps, K8s manifests and Helm charts.
+
+```sh
+# Show when ArgoCD last time changed an object:
+kubectl -n kube-system get configmap coredns -o yaml --show-managed-fields |
+  yq -y \
+  '.metadata.managedFields[] | select(.manager=="argocd-controller") | .time' |
+  yq -r '.'
+```

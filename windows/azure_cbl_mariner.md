@@ -44,4 +44,23 @@ ANSI_COLOR="1;34"
 HOME_URL="https://aka.ms/cbl-mariner"
 BUG_REPORT_URL="https://aka.ms/cbl-mariner"
 SUPPORT_URL="https://aka.ms/cbl-mariner"
+
+# Installing packages using the Mariner package manager:
+root@PAULW11 [ / ]# yum install less
+Loaded plugin: tdnfrepogpgcheck
+Refreshing metadata for: 'CBL-Mariner Official Extras 2.0 x86_64'
+Refreshing metadata for: 'CBL-Mariner Official Microsoft 2.0 x86_64'
+Refreshing metadata for: 'CBL-Mariner Official Base 2.0 x86_64'
+mariner-official-base                  1740014 100%
+Installing:
+less      x86_64      590-4.cm2     mariner-official-base     309.82k    156.08k
+
+Total installed size: 309.82k
+Total download size: 156.08k
+Is this ok [y/N]: y
+less                                    159823 100%
+Testing transaction
+Running transaction
+Installing/Updating: less-590-4.cm2.x86_64
+root@PAULW11 [ / ]#
 ```

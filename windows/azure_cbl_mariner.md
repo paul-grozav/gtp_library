@@ -68,11 +68,24 @@ root@PAULW11 [ / ]#
 ### WSL graphics
 ```sh
 root@PAULW11 [ / ]# ps faux
-root           9  0.0  0.0 122316  8700 ?        Sl   07:29   0:00 /usr/bin/WSLGd
-wslg          13  0.6  0.3 810424 50592 ?        Sl   07:29   0:01  \_ /usr/bin/weston --backend=rdp-backend.so --modules=wslgd-notify.so --xwayland --socket=wayland-0 --shell=rdprail-shell.so --log=/mnt/wslg/weston.log --logger-scopes=log,rdp-backend,rdprail-shell
-wslg         452  0.2  0.4 226900 74016 ?        Ssl  07:29   0:00  |   \_ /usr/bin/Xwayland :0 -rootless -core -listen 37 -wm 38 -terminate -nolisten local -ac
-wslg        1317  0.0  0.0   2476  1872 ?        S    07:30   0:00  \_ /init /mnt/c/Program Files/WSL/msrdc.exe msrdc.exe /wslg /silent /v:58607574-843C-4F2D-BF3B-856B66F299FA /hvsocketserviceid:00000001-FACB-11E6-BD58-64006A7986D3 /plugin:WSLDVC_PACKAGE /wslgsharedmemorypath:WSL\58607574-843C-4F2D-BF3B-856B66F299FA\wslg C:\Program Files\WSL\wslg.rdp
-wslg        1318  0.0  0.0   9616  4196 ?        S    07:30   0:00  \_ /usr/bin/dbus-daemon --syslog --nofork --nopidfile --system
-wslg        1319  0.0  0.0 235336  8376 ?        Sl   07:30   0:00  \_ /usr/bin/pulseaudio --log-time=true --disallow-exit=true --exit-idle-time=-1 --load=module-rdp-sink sink_name=RDPSink --load=module-rdp-source source_name=RDPSource --load=module-native-protocol-unix socket=/mnt/wslg/PulseServer auth-anonymous=true --log-target=newfile:/mnt/wslg/pulseaudio.log
 
+# After a fresh WSL start
+root           9  0.0  0.0 122316  8692 ?        Sl   07:28   0:00 /usr/bin/WSLGd
+wslg          13  0.7  0.3 810424 50504 ?        Sl   07:28   0:01  \_ /usr/bin/weston --backend=rdp-backend.so --modules=wslgd-notify.so --xwayland --socket=wayland-0 --shell=rdprail-shell.so --log=/mnt/wslg/weston.log --logger-scopes=log,rdp-backend,rdprail-shell
+wslg         441  0.2  0.4 226900 73344 ?        Ssl  07:28   0:00  |   \_ /usr/bin/Xwayland :0 -rootless -core -listen 37 -wm 38 -terminate -nolisten local -ac
+wslg        1281  0.0  0.0   2476  1872 ?        S    07:28   0:00  \_ /init /mnt/c/Program Files/WSL/msrdc.exe msrdc.exe /wslg /silent /v:A18FC473-E2F1-4F84-A4D6-BBB23AECADD1 /hvsocketserviceid:00000001-FACB-11E6-BD58-64006A7986D3 /plugin:WSLDVC_PACKAGE /wslgsharedmemorypath:WSL\A18FC473-E2F1-4F84-A4D6-BBB23AECADD1\wslg C:\Program Files\WSL\wslg.rdp
+wslg        1282  0.0  0.0   9616  4108 ?        S    07:28   0:00  \_ /usr/bin/dbus-daemon --syslog --nofork --nopidfile --system
+wslg        1283  0.0  0.0 235336 10392 ?        Sl   07:28   0:00  \_ /usr/bin/pulseaudio --log-time=true --disallow-exit=true --exit-idle-time=-1 --load=module-rdp-sink sink_name=RDPSink --load=module-rdp-source source_name=RDPSource --load=module-native-protocol-unix socket=/mnt/wslg/PulseServer auth-anonymous=true --log-target=newfile:/mnt/wslg/pulseaudio.log
+
+# When windows disappeared
+root           9  0.0  0.0 122316  2164 ?        Sl   Jul08   0:00 /usr/bin/WSLGd
+wslg        1318  0.0  0.0   9616  1660 ?        S    Jul08   0:00  \_ /usr/bin/dbus-daemon --syslog --nofork --nopidfile --system
+wslg        1319  0.0  0.0 235440  4564 ?        Sl   Jul08   0:02  \_ /usr/bin/pulseaudio --log-time=true --disallow-exit=true --exit-idle-time=-1 --load=module-rdp-sink sink_name=RDPSink --load=module-rdp-source source_name=RDPSource --load=module-native-protocol-unix socket=/mnt/wslg/PulseServer auth-anonymous=true --log-target=newfile:/mnt/wslg/pulseaudio.log
+wslg     1287219  0.0  0.3 749936 54120 ?        Sl   06:28   0:00  \_ /usr/bin/weston --backend=rdp-backend.so --modules=wslgd-notify.so --xwayland --socket=wayland-0 --shell=rdprail-shell.so --log=/mnt/wslg/weston.log --logger-scopes=log,rdp-backend,rdprail-shell
+wslg     1287342  0.0  0.4 227712 74984 ?        Ssl  06:28   0:01  |   \_ /usr/bin/Xwayland :0 -rootless -core -listen 46 -wm 47 -terminate -nolisten local -ac
+wslg     1288360  0.0  0.0  18524  8332 ?        Ss   06:29   0:00  |   \_ /usr/libexec/weston-rdprail-shell
+wslg     1287356  0.0  0.0   2480  1876 ?        S    06:28   0:00  \_ /init /mnt/c/Program Files/WSL/msrdc.exe msrdc.exe /wslg /silent /v:58607574-843C-4F2D-BF3B-856B66F299FA /hvsocketserviceid:00000001-FACB-11E6-BD58-64006A7986D3 /plugin:WSLDVC_PACKAGE /wslgsharedmemorypath:WSL\58607574-843C-4F2D-BF3B-856B66F299FA\wslg C:\Program Files\WSL\wslg.rdp
+
+# The wslgsharedmemorypath changes on WSL restarts/reboots
+# The hvsocketserviceid does not change on WSL restarts (with no Windows restart)
 ```

@@ -4,6 +4,22 @@ https://github.com/microsoft/azurelinux
 
 [Download ISO](https://aka.ms/azurelinux-3.0-x86_64.iso)
 
+### 9P
+Azure Linux (previously known as Common Base Linux (CBL) Mariner) uses the [9p
+](https://en.wikipedia.org/wiki/9P_(protocol)) Plan 9 Filesystem Protocol,
+developed by [Bell Labs](https://en.wikipedia.org/wiki/Bell_Labs) for their
+[Plan 9](https://en.wikipedia.org/wiki/Plan_9_from_Bell_Labs) Operating System.
+Azure Linux uses this protocol (filesystem type) to offer access to the Windows
+partitions.
+```sh
+root@PAULW11 [ / ]#  mount | grep -w 9p
+drivers on /usr/lib/wsl/drivers type 9p (ro,nosuid,nodev,noatime,dirsync,aname=drivers;fmask=222;dmask=222,mmap,access=client,msize=65536,trans=fd,rfd=7,wfd=7)
+C:\ on /mnt/c type 9p (rw,noatime,dirsync,aname=drvfs;path=C:\;uid=1000;gid=1000;symlinkroot=/mnt/,mmap,access=client,msize=65536,trans=fd,rfd=5,wfd=5)
+D:\ on /mnt/d type 9p (rw,noatime,dirsync,aname=drvfs;path=D:\;uid=1000;gid=1000;symlinkroot=/mnt/,mmap,access=client,msize=65536,trans=fd,rfd=5,wfd=5)
+```
+
+### WSL
+
 ```sh
 wsl.exe --system --user root
 root@PAULW11 [ / ]# ls -la

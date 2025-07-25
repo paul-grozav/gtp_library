@@ -30,12 +30,11 @@ nodes:
     protocol: tcp # Optional, defaults to tcp
   - containerPort: 30001
     hostPort: 30001
-    listenAddress: "0.0.0.0" # Optional, defaults to "0.0.0.0"
-    protocol: tcp # Optional, defaults to tcp
   - containerPort: 30002
     hostPort: 30002
-    listenAddress: "0.0.0.0" # Optional, defaults to "0.0.0.0"
-    protocol: tcp # Optional, defaults to tcp
+  extraMounts:
+  - hostPath: /path/to/host/storage
+    containerPath: /var/lib/longhorn
 - role: worker
 # - role: worker
 # - role: worker
@@ -44,8 +43,10 @@ nodes:
 # Download binary file from GitHub:
 # https://github.com/kubernetes-sigs/kind/releases
 # Or from k8s.io:
-paul@server $ wget https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64 -o ./kind
-paul@server $ KIND_EXPERIMENTAL_PROVIDER=podman ./kind create cluster --name=local-devel --config=$(pwd)/config.yaml
+paul@server $ wget https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64 \
+  -o ./kind
+paul@server $ KIND_EXPERIMENTAL_PROVIDER=podman ./kind create cluster \
+  --name=local-devel --config=$(pwd)/config.yaml
 using podman due to KIND_EXPERIMENTAL_PROVIDER
 enabling experimental podman provider
 Creating cluster "local-devel" ...
@@ -71,11 +72,12 @@ local-devel-worker          Ready    <none>          2m35s   v1.30.0
 # Get cluster:
 paul@server $ KIND_EXPERIMENTAL_PROVIDER=podman latest/kind get clusters
 # Delete cluster:
-paul@server $ KIND_EXPERIMENTAL_PROVIDER=podman latest/kind delete cluster --name=local-devel
+paul@server $ KIND_EXPERIMENTAL_PROVIDER=podman latest/kind delete cluster \
+  --name=local-devel
 
 # Will download a container image of ~1GiB:
 paul@server $ podman images | grep kind
-docker.io/kindest/node                                                 <none>                    9319cf209ac5  13 months ago  980 MB
+docker.io/kindest/node        <none>         9319cf209ac5  13 months ago  980 MB
 ```
 
 
@@ -87,7 +89,8 @@ docker.io/kindest/node                                                 <none>   
 wget https://github.com/k3s-io/k3s/releases/download/v1.33.1%2Bk3s1/k3s &&
 
 # Start cluster (as a limited/rootless user)
-systemd-run --user --property=Delegate=yes --pty --same-dir --wait --collect --service-type=exec ./k3s server --rootless
+systemd-run --user --property=Delegate=yes --pty --same-dir --wait --collect \
+  --service-type=exec ./k3s server --rootless
 # Get kubeconfig access file from:
 cat ${HOME}/.kube/k3s.yaml
 
@@ -151,7 +154,7 @@ wget -o ./k3d \
 
 # Create cluster named "dev-cluster" with 1 control plane and 2 workers
 # ensure you've exported DOCKER_HOST from above
-./k3d cluster create dev-cluster --servers 1 --agents 2 --api-port 0.0.0.0:6444 &&
+./k3d cluster create dev-cluster --servers 1 --agents 2 --api-port 0.0.0.0:6444
 ```
 ```sh
 # Will download ~310MiB of docker images:

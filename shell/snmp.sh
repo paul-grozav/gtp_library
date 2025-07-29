@@ -17,11 +17,18 @@ stdbuf -i0 -o0 -e0 \
 
 
 # Print both OID and field names. 
-snmpwalk -v2c -c my-public -On 192.168.0.1 | while IFS=' = ' read -r oid value
+stdbuf -i0 -o0 -e0 \
+  snmpwalk -v2c -c my-public -On -Cc 192.168.0.1 |
+  while IFS=' = ' read -r oid value
 do
   # snmpwalk only prints OID but using snmptranslate we obtain the field name
   name=$(snmptranslate "${oid}")
   echo "${name} (${oid}) = ${value}"
-done
+done | tee 192.168.0.1.log
+
+# If you only want to get a single OID value, you can use:
+snmpget -v 2c -c my-public 192.168.0.1 .1.3.6.1.2.1.1.2.0
+# snmpwalk will walk recursively through all children and sub-children of a
+# given OID.
 
 # ============================================================================ #

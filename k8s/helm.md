@@ -20,4 +20,6 @@ kubectl get secret -n my-namespace -l owner=helm,name=my-release-name -o yaml | 
 helmfile diff --skip-deps
 # Apply local defition
 helmfile apply --skip-deps
+# Destroy one component
+helmfile destroy --selector name=my-component
 ```

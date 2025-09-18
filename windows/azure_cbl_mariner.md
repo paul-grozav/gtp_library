@@ -105,3 +105,24 @@ wslg     1287356  0.0  0.0   2480  1876 ?        S    06:28   0:00  \_ /init /mn
 # The wslgsharedmemorypath changes on WSL restarts/reboots
 # The hvsocketserviceid does not change on WSL restarts (with no Windows restart)
 ```
+The WSLg system is made of the weston display server(a Wayland compositor), and
+`MSRDC.exe`, the MicroSoft Remote Desktop Client, which is a process that
+connects to weston, over RDP(Remote Desktop Protocol), to fetch the video buffer
+and display it in the Windows operating system, as one or multiple windows, that
+are seamlessly integrating with the other Windows windows, basically offering
+both Linux and Windows windows on the same taskbar.
+
+There is one msrdc client for each WSL distribution(VM) that you run. Each VM
+runs it's own CBL and WSLGd(with weston). That one msrdc process, opens multiple
+windows.
+
+There is a known problem that, WSLg windows are disappearing or freezing,
+because the msrdc talks to weston over a TCP connection. And when that
+connection is lost, the windows either go away(while GUI apps are still running
+and sending their video output to weston, but no client is reading/rendering it)
+, or the windows just freeze. This is known to happen when Windows goes to sleep
+or hibernates, when you change network settings(enable/disable connection,
+plug/unplug ethernet cables), or when you plug/unplug external monitors.
+There are numerous issues open on this, this being one of them:
+https://github.com/microsoft/wslg/issues/1098 , but apparently Microsoft has not
+prioritized the fix for this in the past ~5 years or so.

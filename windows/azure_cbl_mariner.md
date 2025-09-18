@@ -125,4 +125,5 @@ or hibernates, when you change network settings(enable/disable connection,
 plug/unplug ethernet cables), or when you plug/unplug external monitors.
 There are numerous issues open on this, this being one of them:
 https://github.com/microsoft/wslg/issues/1098 , but apparently Microsoft has not
-prioritized the fix for this in the past ~5 years or so.
+prioritized the fix for this in the past ~5 years or so. A simple fix like
+reconnecting from msrdc if the connection is dropped, would help a lot.

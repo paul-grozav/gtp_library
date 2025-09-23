@@ -120,10 +120,11 @@ There is a known problem that, WSLg windows are disappearing or freezing,
 because the msrdc talks to weston over a TCP connection. And when that
 connection is lost, the windows either go away(while GUI apps are still running
 and sending their video output to weston, but no client is reading/rendering it)
-, or the windows just freeze. This is known to happen when Windows goes to sleep
-or hibernates, when you change network settings(enable/disable connection,
-plug/unplug ethernet cables), or when you plug/unplug external monitors.
-There are numerous issues open on this, this being one of them:
-https://github.com/microsoft/wslg/issues/1098 , but apparently Microsoft has not
-prioritized the fix for this in the past ~5 years or so. A simple fix like
-reconnecting from msrdc if the connection is dropped, would help a lot.
+, or the windows just freeze. This is known to happen when Windows is locked(the
+user session is locked) or when windows goes to sleep or hibernates, when you
+change network settings(enable/disable connection, plug/unplug ethernet cables),
+or when you plug/unplug external monitors. There are numerous issues open on
+this, this being one of them: https://github.com/microsoft/wslg/issues/1098 ,
+but apparently Microsoft has not prioritized the fix for this in the past ~5
+years or so. A simple fix like reconnecting from msrdc if the connection is
+dropped, would help a lot.

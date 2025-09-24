@@ -12,6 +12,12 @@ helm get manifest -n my-namespace my-release-name
 # Or with kubectl
 kubectl get secret -n my-namespace -l owner=helm,name=my-release-name -o yaml | yq -r .items[0].data.release | base64 -d | base64 -d | gunzip -c | jq '.manifest' -r
 
+# Show helm repositories added to known list
+helm repo list
+
+# Update repo contents(get all charts and versions)
+helm repo update grafana
+
 # Show helm chart versions available in the repo 
 helm search repo grafana/grafana --versions
 ```

@@ -177,10 +177,12 @@ targetcli saveconfig
 
 
 # === Extra ===
-# To make a LUN ReadOnly use the following cmd, which creates LUN1 mapped to
-# LUN0 and the last "1" makes it write_protect=true (ro). So this command runs
-# inside the ACLS allowed_initiator
-targetcli /iscsi/iqn.2025-10.com.example:dsl.iso/tpg1/acls/iqn.2025-10.com.example:client1 create 1 0 1
+# To make a LUN ReadOnly use the following cmd, which:
+# 1. Remove default RW LUN0 mapping
+targetcli /iscsi/iqn.2025-10.com.example:dsl.iso/tpg1/acls/iqn.2025-10.com.example:client1 delete 0
+# creates LUN0 mapped to LUN0 and the last "1" makes it write_protect=true (ro).
+# So these commands run inside the ACLS allowed_initiator
+targetcli /iscsi/iqn.2025-10.com.example:dsl.iso/tpg1/acls/iqn.2025-10.com.example:client1 create 0 0 1
 ```
 
 ## Initiator(iPXE)

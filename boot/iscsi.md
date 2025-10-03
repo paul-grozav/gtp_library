@@ -146,6 +146,8 @@ To alter the content of the JSON you can use the following CLI commands:
 iqn="iqn.2025-10.com.example" &&
 allowed_initiator="${iqn}:client1" &&
 fileio_path="/home/paul/data/FreeDOS/dosnethdd.img" &&
+# "_" not accepted in /iscsi objects, but accepted in BS/fileio objects. better
+# to avoid them. "." are accepted in both.
 fileio_name="doshdd" &&
 fileio_iqn="${iqn}:${fileio_name}" &&
 

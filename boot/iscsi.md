@@ -6,6 +6,7 @@ This was tested with the following software:
   [sanboot](https://ipxe.org/cmd/sanboot) and
   [sanhook](https://ipxe.org/cmd/sanhook)
 
+## Target
 Installing the software on Debian(13):
 ```sh
 apt-get update &&
@@ -173,7 +174,30 @@ targetcli /iscsi/${iqn}:${fileio_basename}/tpg1/luns delete lun0 &&
 targetcli /iscsi delete ${iqn}:${fileio_basename} &&
 targetcli /backstores/fileio delete ${fileio_name} &&
 targetcli saveconfig
+```
 
+## Initiator(iPXE)
+```sh
+#!ipxe
+dhcp
+
+# The format of an iSCSI SAN URI is defined by RFC 4173. The general syntax is:
+#   iscsi:<servername>:<protocol>:<port>:<LUN>:<targetname>
+# <servername> is the DNS name or IP address of the iSCSI target.
+# <protocol> is ignored and can be left empty.1)
+# <port> is the TCP port of the iSCSI target. It can be left empty, in which case the default port (3260) will be used.
+# <LUN> is the SCSI LUN of the boot disk, in hexadecimal. It can be left empty, in which case the default LUN (0) will be used.
+# <targetname> is the iSCSI target IQN.
+
+set initiator-iqn iqn.2025-10.com.example:client1
+# sanboot iscsi:192.168.0.2:6:3260:0:iqn.2025-10.com.example:dosnethdd.img
+# sanboot iscsi:192.168.0.2:6:3260:0:iqn.2025-10.com.example:dsl.iso
+set target_host 192.168.0.2
+set target_protocol 6
+set target_port 3260
+set target_iqn iqn.2025-10.com.example:dsl.iso
+set target_lun 0
+sanboot iscsi:${target_host}:${target_protocol}:${target_port}:${target_lun}:${target_iqn}
 ```
 
 ## Terminology

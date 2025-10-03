@@ -143,24 +143,23 @@ To alter the content of the JSON you can use the following CLI commands:
 
 ```sh
 # === Expose hdd.img over iscsi ===
-fileio_path="/home/paul/data/FreeDOS/dosnethdd.img" &&
-fileio_basename="$(basename ${fileio_path})" &&
-fileio_name="doshdd" &&
 iqn="iqn.2025-10.com.example" &&
 allowed_initiator="${iqn}:client1" &&
+fileio_path="/home/paul/data/FreeDOS/dosnethdd.img" &&
+fileio_name="doshdd" &&
+fileio_iqn="${iqn}:${fileio_name}" &&
 
 # Create the FileIO BackStore Storage object - this is the actual file on the
 # disk that will be exposed over the network.
 targetcli /backstores/fileio create ${fileio_name} ${fileio_path} &&
 # Create the iSCSI target object including the TPG1 and a portal listening on
 # 0.0.0.0 port 3260.
-targetcli /iscsi create ${iqn}:${fileio_basename} &&
+targetcli /iscsi create ${fileio_iqn} &&
 # Add the previously created FileIO BackStore as a LUN to the iSCSI object. 
-targetcli /iscsi/${iqn}:${fileio_basename}/tpg1/luns create \
+targetcli /iscsi/${fileio_iqn}/tpg1/luns create \
   /backstores/fileio/${fileio_name} &&
 # Restrict access to iSCSI object and only allow one initiator to access it.
-targetcli /iscsi/${iqn}:${fileio_basename}/tpg1/acls create \
-  ${allowed_initiator} &&
+targetcli /iscsi/${fileio_iqn}/tpg1/acls create ${allowed_initiator} &&
 # Save configuration objects created in RAM/runtime to JSON persistent storage.
 targetcli saveconfig
 
@@ -168,10 +167,9 @@ targetcli saveconfig
 targetcli ls
 
 # If you want to remove the objects, do it in reverse order
-targetcli /iscsi/${iqn}:${fileio_basename}/tpg1/acls delete \
-  ${allowed_initiator} &&
-targetcli /iscsi/${iqn}:${fileio_basename}/tpg1/luns delete lun0 &&
-targetcli /iscsi delete ${iqn}:${fileio_basename} &&
+targetcli /iscsi/${fileio_iqn}/tpg1/acls delete ${allowed_initiator} &&
+targetcli /iscsi/${fileio_iqn}/tpg1/luns delete lun0 &&
+targetcli /iscsi delete ${fileio_iqn} &&
 targetcli /backstores/fileio delete ${fileio_name} &&
 targetcli saveconfig
 ```

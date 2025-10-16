@@ -128,3 +128,11 @@ this, this being one of them: https://github.com/microsoft/wslg/issues/1098 ,
 but apparently Microsoft has not prioritized the fix for this in the past ~5
 years or so. A simple fix like reconnecting from msrdc if the connection is
 dropped, would help a lot.
+
+### WSLg problems
+#### Scaling
+Run `notepad %UserProfile%\.wslgconfig` and ensure content:
+```ini
+[system-distro-env]
+WESTON_RDP_DEBUG_DESKTOP_SCALING_FACTOR=100
+```

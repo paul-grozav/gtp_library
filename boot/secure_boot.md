@@ -81,5 +81,103 @@ menuentry 'Paul Aleph Oracle Linux 10.0.0' --class fedora --class gnu-linux --cl
 }
 ```
 
+#### UEFI Secure Network booting
+```sh
+# UEFI Secure network boot
+qemu-system-x86_64 -device virtio-net-pci,netdev=net0 -netdev user,id=net0,net=192.168.88.0/24,tftp=/root/redhat,bootfile=/shimx64.efi -drive if=pflash,format=raw,unit=0,file=/usr/share/OVMF/OVMF_CODE_4M.ms.fd,readonly=on -drive if=pflash,format=raw,unit=1,file=${HOME}/OVMF_VARS_4M.ms.fd -m 2G -cpu Broadwell -boot n -M q35 -serial stdio -display none -machine graphics=off
+``` 
+But note that the pre-signed grub build is not built with `./configure --with-gnutls` and thus has no TLS support, which means you can't load the kernel from an HTTPS server.
+
+#### Building your GRUB
+
+##### Building GRUB
+```sh
+# podman run -it --rm ubuntu:24.04
+apt-get install -y \
+  git \
+  curl \
+  autoconf \
+  gettext \
+  wget \
+  python3 \
+  libtool \
+  ` # ` \
+  autoconf-archive \
+  libpkgconf3 \
+  pkg-config \
+  pkgconf \
+  pkgconf-bin \
+  gawk \
+  ` # ` \
+  build-essential \
+  autopoint \
+  libbison-dev \
+  flex \
+  &&
+update-alternatives --set awk /usr/bin/gawk &&
+cd /root &&
+if [ ! -d src ]
+then
+  git clone https://git.savannah.gnu.org/git/grub.git src
+  # git checkout to certain branch/tag? (thinking)
+fi &&
+
+# 1. Convert your trusted CA certificate (e.g., in PEM format) to DER format first - can we integrate this CA into the grub build?
+# curl -o ./trusted_ca.pem https://letsencrypt.org/certs/isrgrootx1.pem &&
+# openssl x509 -in trusted_ca.pem -out trusted_ca.der -outform DER &&
+
+# 2. Configure and build GRUB, linking the CA certificate
+# install autopoint
+cd src &&
+bash bootstrap &&
+bash autogen.sh &&
+mkdir /root/install &&
+time sh ./configure \
+  MAWK=gawk \
+  AWK=gawk \
+  ` # disable PO translation` \
+  --disable-nls \
+  ` # This prefix defaults to / - this is where apps will be installed` \
+  --prefix=/root/install \
+  --target=x86_64 \
+  --with-platform=efi \
+  ` # This adds the TLS to HTTP = httpS ? ` \
+  --with-gnutls \
+  ` # --enable-grub-modules="net http https pki keychain" ` \
+  ` # --enable-boot-time-module-config ` \
+  ` # --with-grub-efi-certs=$(pwd)/../trusted_ca.der ` \
+  &&
+
+time make \
+  MAWK=gawk \
+  AWK=gawk \
+  --jobs $(( $(nproc) - 1 )) \
+  &&
+
+#./grub-install \
+#  --target=x86_64-efi \
+#  --efi-directory=../install \
+#  --bootloader-id=GRUB \
+#  &&
+# This DESTDIR path is relative to ./configure --prefix (chroot)
+# DESTDIR defaults to /
+make install &&
+
+mkdir /root/build &&
+/root/install/bin/grub-mkimage \
+  --format=x86_64-efi \
+  --prefix=/root/install \
+  --output=/root/build/BOOTX64.EFI \
+  ` # Modules ` \
+  net http gcry_md5 gcry_sha256 gcry_rsa gcry_sha512 \
+  &&
+true
+# Use the /root/build/BOOTX64.EFI
+```
+
+##### MOK
+... to be continued ...
+
+
 See also:
 1. https://docs.oracle.com/en/operating-systems/oracle-linux/10/secure-boot/index.html

@@ -201,5 +201,10 @@ before writing it to the actual MOK list. Also, before the shim starts your
 kernel, it will check if the kernel is signed with one of the keys in the MOK
 list. If the kernel is not signed by a MOK, then it will refuse to start it.
 
+The shim offers a more convenient way to import/update/manage certificates in
+the NVRAM, authorizing binaries signed with new keys to run, without going
+through the tedious work of updating the DB in UEFI's setup utility, by loading
+the keys from an external USB drive.
+
 See also:
 1. https://docs.oracle.com/en/operating-systems/oracle-linux/10/secure-boot/index.html

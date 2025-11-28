@@ -1,5 +1,7 @@
 Enable `Secure Boot` in the UEFI firmware setup. For example by going to:
 `Security -> Secure Boot -> Secure Boot  [Enabled]`
+
+If the item you are trying to boot isn't signed properly you will see:
 ```sh
 
   /---------- Secure Boot Violation ----------\
@@ -12,6 +14,21 @@ Enable `Secure Boot` in the UEFI firmware setup. For example by going to:
   \-------------------------------------------/
 
 ```
+or just:
+```sh
+>>Start PXE over IPv4.
+  Station IP address is 192.168.88.15
+
+  Server IP address is 192.168.88.2
+  NBP filename is /BOOTX64.EFI
+  NBP filesize is 512000 Bytes
+ Downloading NBP file...
+
+  NBP file downloaded successfully.
+BdsDxe: loading Boot0001 "UEFI PXEv4 (MAC:525400123456)" from PciRoot(0x0)/Pci(0x2,0x0)/MAC(525400123456,0x1)/IPv4(0.0.0.0,0x0,DHCP,0.0.0.0,0.0.0.0,0.0.0.0)
+BdsDxe: failed to load Boot0001 "UEFI PXEv4 (MAC:525400123456)" from PciRoot(0x0)/Pci(0x2,0x0)/MAC(525400123456,0x1)/IPv4(0.0.0.0,0x0,DHCP,0.0.0.0,0.0.0.0,0.0.0.0): Access Denied
+```
+
 #### ISO bootloader
 Then you can download [OracleLinux-R10-U0-x86_64-boot-uek.iso](
 https://yum.oracle.com/ISOS/OracleLinux/OL10/u0/x86_64/OracleLinux-R10-U0-x86_64-boot-uek.iso)

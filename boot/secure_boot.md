@@ -89,7 +89,7 @@ podman run -it --rm --name fedora_tmp \
 $ microdnf install -y edk2-ovmf
 podman cp fedora_tmp:/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd .
 podman cp fedora_tmp:/usr/share/edk2/ovmf/OVMF_VARS.secboot.fd .
-qemu-system-x86_64 -device virtio-net-pci,netdev=net0 -netdev user,id=net0,net=192.168.88.0/24,tftp=/root/redhat,bootfile=/shimx64.efi -drive if=pflash,format=raw,unit=0,file=$(pwd)/OVMF_CODE.secboot.fd,readonly=on -drive if=pflash,format=raw,unit=1,file=$(pwd)/OVMF_VARS.secboot.fd -m 2G -cpu max -boot n -M q35 -serial stdio -display none -machine graphics=off
+qemu-system-x86_64 -device virtio-net-pci,netdev=net0 -netdev user,id=net0,net=192.168.88.0/24,tftp=$(pwd),bootfile=/shimx64.efi -drive if=pflash,format=raw,unit=0,file=$(pwd)/OVMF_CODE.secboot.fd,readonly=on -drive if=pflash,format=raw,unit=1,file=$(pwd)/OVMF_VARS.secboot.fd -m 2G -cpu max -boot n -M q35 -serial stdio -display none -machine graphics=off
 ``` 
 But note that the pre-signed grub build is not built with `./configure --with-gnutls` and thus has no TLS support, which means you can't load the kernel from an HTTPS server.
 

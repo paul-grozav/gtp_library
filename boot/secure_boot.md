@@ -191,6 +191,8 @@ mkdir /root/build &&
   --format=x86_64-efi \
   --prefix=/root/install \
   --output=/root/build/BOOTX64.EFI \
+  ` # Embedded grub config file ` \
+  --config=pxe_grub.cfg \
   ` # Modules ` \
   net http gcry_md5 gcry_sha256 gcry_rsa gcry_sha512 \
   &&

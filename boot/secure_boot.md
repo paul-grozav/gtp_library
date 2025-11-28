@@ -53,9 +53,9 @@ your DHCP machine config to boot `shimx64.efi`:
 >>Checking Media Presence......
 >>Media Present......
 >>Start PXE over IPv4 on MAC: A1-B2-C3-D4-E5-F6.
-  Station IP address is ...10.89.85.31
+  Station IP address is ...192.168.0.2
 
-  Server IP address is ...10.89.85.5
+  Server IP address is ...192.168.0.1
   NBP filename is shimx64.efi
   NBP filesize is 965024 Bytes
 

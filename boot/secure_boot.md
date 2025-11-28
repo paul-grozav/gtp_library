@@ -175,9 +175,31 @@ true
 # Use the /root/build/BOOTX64.EFI
 ```
 
-##### MOK
-... to be continued ...
+##### PK, KEK, DB/DBX, MOK
+The UEFI stores it's settings in the NVRAM filesystem. In NVRAM we can find the:
+- **PK (Platform Key)** - this is set by the computer manufacturer( HP, Dell,
+Lenovo ) - this is the Root of Trust - this controls the authorization to update
+the KEK.
+- **KEK (Key Exchange Key)** - set by manufacturer but can be changed by system
+owner, if in secure boot *Setup Mode* - this authorizes the updates to DB / DBX.
+- **DB (DataBase) / DBX (Forbidden DataBase) of signatures** - this can be
+changed by the system/platform owner in the UEFI setup utility. This controls
+what binaries are allowed to run(like Linux kernels, BSD, Windows, shim, etc)
+and the DBX controls the list of revoked or compromised binary executables. 
 
+The [shim](https://github.com/rhboot/shim) is a binary that is already
+pre-signed with Microsoft's certificate that is whitelisted in the DB of most
+UEFI systems, thus allowing it to start when secure boot is enabled. It defines
+and uses a new section in NVRAM, the **MOK (Machine Owner Key)**. The shim
+allows the machine/system/platform owner to register a key/certificate in the
+MOK, even during the runtime of Linux, using a command:
+`mokutil --import my.crt` This command will place the new certificate in a
+temporary location, and the next time the shim starts/runs, it will detect the
+new certificate, and ask for [approval](
+   https://commons.wikimedia.org/wiki/File:Shim_MokManager_screenshot.png)
+before writing it to the actual MOK list. Also, before the shim starts your
+kernel, it will check if the kernel is signed with one of the keys in the MOK
+list. If the kernel is not signed by a MOK, then it will refuse to start it.
 
 See also:
 1. https://docs.oracle.com/en/operating-systems/oracle-linux/10/secure-boot/index.html

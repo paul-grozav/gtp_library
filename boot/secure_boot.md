@@ -84,6 +84,7 @@ menuentry 'Paul Aleph Oracle Linux 10.0.0' --class fedora --class gnu-linux --cl
 #### UEFI Secure Network booting
 ```sh
 # UEFI Secure network boot
+# Load OVMF from fedora EDK2, which has UEFI+SecureBoot+NetworkingStack
 podman run -it --rm --name fedora_tmp \
   registry.fedoraproject.org/fedora-minimal:37
 $ microdnf install -y edk2-ovmf

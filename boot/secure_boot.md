@@ -14,6 +14,18 @@ If the item you are trying to boot isn't signed properly you will see:
   \-------------------------------------------/
 
 ```
+or:
+```sh
+┌──────────────────────────────────────────────────┐
+│                      ERROR                       │
+│                                                  │
+│  Verification failed: (0x1A) Security Violation  │
+│                                                  │
+│                       ┌────┐                     │
+│                       │ OK │                     │
+│                       └────┘                     │
+└──────────────────────────────────────────────────┘
+```
 or just:
 ```sh
 >>Start PXE over IPv4.
@@ -107,7 +119,21 @@ podman run -it --rm --name fedora_tmp \
 $ microdnf install -y edk2-ovmf
 podman cp fedora_tmp:/usr/share/edk2/ovmf/OVMF_CODE.secboot.fd .
 podman cp fedora_tmp:/usr/share/edk2/ovmf/OVMF_VARS.secboot.fd .
-qemu-system-x86_64 -device virtio-net-pci,netdev=net0 -netdev user,id=net0,net=192.168.88.0/24,tftp=$(pwd),bootfile=/shimx64.efi -drive if=pflash,format=raw,unit=0,file=$(pwd)/OVMF_CODE.secboot.fd,readonly=on -drive if=pflash,format=raw,unit=1,file=$(pwd)/OVMF_VARS.secboot.fd -m 2G -cpu max -boot n -M q35 -serial stdio -display none -machine graphics=off
+# Then use with QEMU
+> vm.pcap && tail -f vm.pcap | wireshark -k -i -
+qemu-system-x86_64 \
+  -device virtio-net-pci,netdev=net0 \
+  -object filter-dump,id=f1,netdev=net0,file=vm.pcap \
+  -netdev user,id=net0,tftp=$(pwd),bootfile=/shimx64.efi \
+  -drive if=pflash,format=raw,unit=0,file=$(pwd)/OVMF_CODE.secboot.fd,readonly=on \
+  -drive if=pflash,format=raw,unit=1,file=$(pwd)/OVMF_VARS.secboot.fd \
+  -m 2G \
+  -cpu max \
+  -boot n \
+  -M q35 \
+  -serial stdio \
+  -display none \
+  -machine graphics=off
 ``` 
 But note that the pre-signed grub build is not built with `./configure --with-gnutls` and thus has no TLS support, which means you can't load the kernel from an HTTPS server.
 
@@ -187,14 +213,18 @@ time make \
 make install &&
 
 mkdir /root/build &&
+echo "# place your config here" >> /root/grub.cfg &&
 /root/install/bin/grub-mkimage \
   --format=x86_64-efi \
   --prefix=/root/install \
   --output=/root/build/BOOTX64.EFI \
   ` # Embedded grub config file ` \
-  --config=pxe_grub.cfg \
+  --config=grub.cfg \
   ` # Modules ` \
-  net http gcry_md5 gcry_sha256 gcry_rsa gcry_sha512 \
+  net efinet http gcry_md5 gcry_sha256 gcry_rsa gcry_sha512 tftp \
+  configfile normal linux part_gpt part_msdos \
+  search_fs_uuid echo terminal efi_gop efi_uga all_video \
+  font gfxmenu reboot \
   &&
 true
 # Use the /root/build/BOOTX64.EFI

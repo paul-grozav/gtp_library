@@ -237,6 +237,15 @@ true
 But with all the tries, the build still doesn't have support for https. So I'm
 looking back into [ipxe](https://ipxe.org/) .
 
+Just make sure that your `shim` actually loads ipxe.efi instead of grub.
+```sh
+$ ln -sf ipxe.efi grubx64.efi
+
+grubx64.efi -> ipxe.efi
+```
+Make a symlink in the TFTP server dir(or rename the ipxe), so that when shim
+loads the pre-hardcoded grub filename, it actually loads ipxe instead.
+
 ##### PK, KEK, DB/DBX, MOK
 The UEFI stores it's settings in the NVRAM filesystem. In NVRAM we can find the:
 - **PK (Platform Key)** - this is set by the computer manufacturer( HP, Dell,

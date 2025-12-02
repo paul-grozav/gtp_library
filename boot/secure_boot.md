@@ -169,6 +169,8 @@ if [ ! -d src ]
 then
   git clone https://git.savannah.gnu.org/git/grub.git src
   # git checkout to certain branch/tag? (thinking)
+  git checkout grub-2.12
+  # https / tls is not supported in the master branch, only in tag releases
 fi &&
 
 # 1. Convert your trusted CA certificate (e.g., in PEM format) to DER format first - can we integrate this CA into the grub build?
@@ -195,6 +197,9 @@ time sh ./configure \
   ` # --enable-grub-modules="net http https pki keychain" ` \
   ` # --enable-boot-time-module-config ` \
   ` # --with-grub-efi-certs=$(pwd)/../trusted_ca.der ` \
+  --enable-device-mapper \
+  --enable-libzfs \
+  --enable-net \
   &&
 
 time make \
@@ -229,6 +234,8 @@ echo "# place your config here" >> /root/grub.cfg &&
 true
 # Use the /root/build/BOOTX64.EFI
 ```
+But with all the tries, the build still doesn't have support for https. So I'm
+looking back into [ipxe](https://ipxe.org/) .
 
 ##### PK, KEK, DB/DBX, MOK
 The UEFI stores it's settings in the NVRAM filesystem. In NVRAM we can find the:

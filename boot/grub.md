@@ -1,4 +1,4 @@
-# GRUB
+# GRUB - GRand Unified Bootloader
 ```sh
 # Show network interface cards
 net_ls_cards

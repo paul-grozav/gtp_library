@@ -137,7 +137,7 @@ qemu-system-x86_64 \
 ``` 
 But note that the pre-signed grub build is not built with `./configure --with-gnutls` and thus has no TLS support, which means you can't load the kernel from an HTTPS server.
 
-#### Building your GRUB
+#### Building your GRUB with HTTPS support ?
 
 ##### Building GRUB
 ```sh
@@ -237,6 +237,7 @@ true
 But with all the tries, the build still doesn't have support for https. So I'm
 looking back into [ipxe](https://ipxe.org/) .
 
+#### Replacing GRUB with iPXE
 Just make sure that your `shim` actually loads ipxe.efi instead of grub.
 ```sh
 $ ln -sf ipxe.efi grubx64.efi
@@ -246,7 +247,44 @@ grubx64.efi -> ipxe.efi
 Make a symlink in the TFTP server dir(or rename the ipxe), so that when shim
 loads the pre-hardcoded grub filename, it actually loads ipxe instead.
 
-##### PK, KEK, DB/DBX, MOK
+##### Signing the ipxe efi
+Use Ubuntu package: `sbsigntool` to manipulate signatures on UEFI binaries and
+drivers.
+
+To sign the iPXE binary you can use the commands below:
+```sh
+openssl req \
+  -newkey rsa:2048 \
+  -nodes \
+  -keyout my_mok_key.key \
+  -new \
+  -x509 \
+  -sha256 \
+  -days 365000 \
+  -subj "/CN=My Secure Boot Key/" \
+  -out my_mok_cert.pem \
+  &&
+# wget https://boot.ipxe.org/ipxe.efi &&
+sbsign \
+  ` # Your private key (used for signing). ` \
+  --key my_mok_key.key \
+  ` # Your public certificate corresponding to the key. This will be used by ` \
+  ` # the Shim to verify the signature). ` \
+  --cert my_mok_cert.pem \
+  ` # The generated signed file ` \
+  --output ipxe-signed.efi \
+  ` # The original, unsigned file ` \
+  ipxe.efi \
+  &&
+# List signature in file
+sbverify --list ipxe-signed.efi &&
+# ... shows issuer, subject
+sbverify --cert my_mok_cert.pem ipxe-signed.efi &&
+# should show: "Signature verification OK"
+true
+```
+
+#### PK, KEK, DB/DBX, MOK
 The UEFI stores it's settings in the NVRAM filesystem. In NVRAM we can find the:
 - **PK (Platform Key)** - this is set by the computer manufacturer( HP, Dell,
 Lenovo ) - this is the Root of Trust - this controls the authorization to update

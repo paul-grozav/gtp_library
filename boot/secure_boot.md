@@ -296,19 +296,99 @@ changed by the system/platform owner in the UEFI setup utility. This controls
 what binaries are allowed to run(like Linux kernels, BSD, Windows, shim, etc)
 and the DBX controls the list of revoked or compromised binary executables. 
 
+#### Shim
 The [shim](https://github.com/rhboot/shim) is a binary that is already
 pre-signed with Microsoft's certificate that is whitelisted in the DB of most
 UEFI systems, thus allowing it to start when secure boot is enabled. It defines
 and uses a new section in NVRAM, the **MOK (Machine Owner Key)**. The shim
 allows the machine/system/platform owner to register a key/certificate in the
 MOK, even during the runtime of Linux, using a command:
-`mokutil --import my.crt` This command will place the new certificate in a
-temporary location, and the next time the shim starts/runs, it will detect the
-new certificate, and ask for [approval](
-   https://commons.wikimedia.org/wiki/File:Shim_MokManager_screenshot.png)
-before writing it to the actual MOK list. Also, before the shim starts your
-kernel, it will check if the kernel is signed with one of the keys in the MOK
-list. If the kernel is not signed by a MOK, then it will refuse to start it.
+```sh
+# Make sure you have the certificate in DER format, o convert from PEM with:
+# $ openssl x509 -outform der -in my.crt.pem -out my.crt.der
+
+# Importing will ask for a password, password that you will need to enter later. 
+$ mokutil --import my.crt.der
+input password:
+input password again:
+```
+This command will place the new certificate in a
+temporary list/location:
+```sh
+# See new certificates, the ones that will be enrolled :
+$ mokutil --list-new
+
+# See already enrolled certificates:
+$ mokutil --list-enrolled
+```
+And the next time the shim starts/runs, it will detect the new certificate, and
+load `mmx64.efi`, the MOK Manager, which will ask for [approval](
+  https://commons.wikimedia.org/wiki/File:Shim_MokManager_screenshot.png)
+, and for the same password you used while importing the key in Linux, before
+moving the certificate/key to the enrolled MOK list.
+```txt
+┌─────────────────────────────────────────┐
+│         Shim UEFI key management        │
+│                                         │
+│                                         │
+│ Press any key to perform MOK management │
+│                                         │
+│                                         │
+│ Booting in 10 seconds                   │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│        Perform MOK management           │
+│                                         │
+│       ┌───────────────────────┐         │
+│       │     Continue boot     │         │
+│       │      Enroll MOK       │         │
+│       │ Enroll key from disk  │         │
+│       │ Enroll hash from disk │         │
+│       └───────────────────────┘         │
+│                                         │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│             [Enroll MOK]                │
+│                                         │
+│             ┌────────────┐              │
+│             │ View key 0 │              │
+│             │  Continue  │              │
+│             └────────────┘              │
+│                                         │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│             Enroll the key(s)?          │
+│                                         │
+│                  ┌─────┐                │
+│                  │ No  │                │
+│                  │ Yes |                │
+│                  └─────┘                │
+│                                         │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│             Enroll the key(s)?          │
+│                                         │
+│    ┌───────────────────────────────┐    │
+│    │ Password:                     |    │
+│    └───────────────────────────────┘    │
+│                  └─────┘                │
+│                                         │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│        Perform MOK management           │
+│                                         │
+│       ┌───────────────────────┐         │
+│       │        Reboot         │         │
+│       │ Enroll key from disk  │         │
+│       │ Enroll hash from disk │         │
+│       └───────────────────────┘         │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+Also, before the shim starts your kernel, it will check if the kernel is signed
+with one of the keys in the MOK enrolled keys list. If the kernel is not signed
+by a MOK, then it will refuse to start it.
 
 The shim offers a more convenient way to import/update/manage certificates in
 the NVRAM, authorizing binaries signed with new keys to run, without going

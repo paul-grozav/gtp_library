@@ -320,6 +320,10 @@ $ mokutil --list-new
 
 # See already enrolled certificates:
 $ mokutil --list-enrolled
+
+# After reboot and enrolling, check with:
+$ mokutil --test-key my.crt.der
+my.crt.der is already enrolled
 ```
 And the next time the shim starts/runs, it will detect the new certificate, and
 load `mmx64.efi`, the MOK Manager, which will ask for [approval](

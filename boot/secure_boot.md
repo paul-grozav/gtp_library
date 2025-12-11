@@ -401,3 +401,42 @@ the keys from an external USB drive.
 
 See also:
 1. https://docs.oracle.com/en/operating-systems/oracle-linux/10/secure-boot/index.html
+
+
+#### UEFI HTTPS boot
+Newer UEFI firmwares support HTTPS booting directly. This requires booting a
+**UKI** image (Unified Kernel Image) which you can prepare like this:
+
+```sh
+# Requirements: kernel, InitRamDisk and kernel parameters
+
+# Start with the kernel image
+cp kernel uki-kernel.efi &&
+
+# 2. Embed the InitRamDisk: injects content into the .initrd section
+objcopy \
+  --add-section .initrd=/path/to/aleph.ird \
+  --change-section-vma .initrd=0x2000000 \
+  uki-kernel.efi &&
+
+# 3. Embed the Command Line: injects content into the .cmdline section
+echo "initrd=initramfs ifname=eth0:11:22:33:44:55:66 ip=:::::eth0:dhcp nomodeset console=tty0 console=ttyS1,115200n8 config_srv_url=https://192.168.0.1:443/boot/ root_sfs_path=linux/aleph/one.squashfs" > kernel_params.txt &&
+objcopy \
+  --add-section .cmdline=${CMDLINE_FILE} \
+  --change-section-vma .cmdline=0x4000000 \
+  ${OUTPUT_UKI}
+true
+```
+
+```txt
+>>Checking Media Presence......
+>>Media Present......
+>>Start HTTP Boot over IPv4 on MAC: AA-BB-CC-DD-EE-FF....
+  Station IP address is 192.168.1.2
+
+  URI: https://boot.server.paul.grozav.info:443/bin/linux/aleph/uki.efi
+
+  Error: Could not retrieve NBP file size from HTTP server.
+
+  Error: Unexpected network error.
+```

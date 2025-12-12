@@ -537,3 +537,25 @@ Select: Yes
 Note that even if Secure Boot is disabled, you still need to customize the TLS
 keys in UEFI settings, and add the ISRG X1 certificate to make HTTPS download
 work.
+
+Once the certificates are loaded into UEFI's NVRAM, you can enable HTTPS booting
+and define your boot option:
+```txt
+UEFI settings -> Advanced -> Network Stack Configuration ->
+  IPv4 HTTP Support        [Enabled]
+
+# Then save and reboot, and in the Advanced section you will see the new entry:
+UEFI settings -> Advanced -> MAC:AABBCCDDEEFF-HTTP Boot Configuration
+
+# And fill the form to create the new boot option entry:
+Input the description   UEFI HTTP Aleph Debian v.123
+Internet Protocol       [IPv4]
+Boot URI                https://boot.server.paul.grozav.info:443/bin/linux/aleph/uki.efi
+
+# Save and reboot. The boot option will show up in the boot configuration menu.
+
+# Note that I've also set :
+UEFI settings -> Advanced -> MAC:AABBCCDDEEFF-IPv4 Network Configuration
+Configured              [Enabled]
+Enable DHCP             [Enabled]
+```

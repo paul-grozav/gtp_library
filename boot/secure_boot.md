@@ -405,7 +405,9 @@ See also:
 
 #### UEFI HTTPS secure boot
 Newer UEFI firmwares support HTTPS booting directly. This requires booting a
-**UKI** image (Unified Kernel Image) which you can prepare like this:
+**UKI** image ([Unified Kernel Image](
+  https://uapi-group.org/specifications/specs/unified_kernel_image/)) which you
+can prepare like this:
 
 ```sh
 # Requirements: kernel, InitRamDisk and kernel parameters

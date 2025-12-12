@@ -403,7 +403,7 @@ See also:
 1. https://docs.oracle.com/en/operating-systems/oracle-linux/10/secure-boot/index.html
 
 
-#### UEFI HTTPS boot
+#### UEFI HTTPS secure boot
 Newer UEFI firmwares support HTTPS booting directly. This requires booting a
 **UKI** image (Unified Kernel Image) which you can prepare like this:
 
@@ -425,6 +425,9 @@ objcopy \
   --add-section .cmdline=${CMDLINE_FILE} \
   --change-section-vma .cmdline=0x4000000 \
   ${OUTPUT_UKI}
+
+# 4. (Optional) Don't forget to sign your UKI file with your key.
+# sbsign ...
 true
 ```
 
@@ -440,3 +443,95 @@ true
 
   Error: Unexpected network error.
 ```
+This is because of TLS handshake. You need to enroll the Let's Encrypt `ISRG X1`
+certificate into UEFI's TLS settings, to authorize the connection to that HTTPS
+server. Also, you will need to authorize the execution of the UKI binary by
+adding the key that was used to sign the UKI, into UEFI's DB.
+
+These keys will be loaded from the disk(use virtual cd/floppy/usb or pxe to boot
+linux and save the key to the disk if you have one):
+```sh
+# Place on disk NVME / EFI parition
+curl https://letsencrypt.org/certs/isrgrootx1.der \
+  -o /boot/efi/EFI/isrgrootx1.der &&
+curl https://boot.server.paul.grozav.info:443/secure_boot_cert.der \
+  -o /boot/efi/EFI/secure_boot_cert.der &&
+
+# Boot into UEFI setup
+reboot
+
+
+# 1. Add the TLS/HTTPS DER certificate
+# UEFI settings -> Advanced -> Tls Auth Configuration -> Server CA Configuration
+#   -> Enroll Cert -> Enroll Cert Using File
+/------------------------------\
+|    Select Storage Device     |
+|------------------------------|
+| HDD Unknown 598MB            |
+|------------------------------|
+|                              |
+\------------------------------/
+# Select your /boot/efi partition on your disk
+/-----------------------\
+|           \           |
+|-----------------------|
+| <EFI>                 |
+|-----------------------|
+|   HDD Unknown 598MB   |
+\-----------------------/
+# Select the EFI folder
+/-----------------------\
+|          \EFI         |
+|-----------------------|
+| <..>                  |
+| <BOOT>                |
+| <redhat>              |
+| isrgrootx1.der        |
+|-----------------------|
+|   HDD Unknown 598MB   |
+\-----------------------/
+# Select your isrgrootx1.der certificate
+# Then this will show up in your list and you will need to select:
+# -> Commit Changes and Exit
+
+
+# 2. Add the Secure Boot DER certificate:
+# Go to security -> Secure Boot [Custom] -> Expert Key Management ->
+# You will see something like:
+  Secure Boot variable      | Size| Keys| Key    
+  Source                                         
+> Platform Key          (PK)|  832|    1| Factory
+> Key Exchange Keys    (KEK)| 3066|    2| Factory
+> Authorized Signatures (db)| 6133|    4| Factory
+> Forbidden  Signatures(dbx)|11788|  245| Factory
+> Authorized TimeStamps(dbt)|    0|    0| No Keys
+> OsRecovery Signatures(dbr)|    0|    0| No Keys
+
+# Go to: Authorized Signatures -> Append -> From file -> Select disk and file
+/--------------------------\
+|    Input File Format     |
+|--------------------------|
+| Public Key Certificate   |
+| Authenticated Variable   |
+| EFI PE/COFF Image        |
+\--------------------------/
+Select: Public Key Certificate
+/--------------------------------------------------\
+|           Enter Certificate Owner GUID           |
+|--------------------------------------------------|
+|   GUID  [26DC4851-195F-4AE1-9A19-FBF883BBB35E]   |
+\--------------------------------------------------/
+Press enter to confirm GUID
+/----------------- Append  -----------------\
+|                                           |
+|  Press 'Yes' to update 'db' with content  |
+|        from secure_boot_cert.der          |
+|                                           |
+|-------------------------------------------|
+|        Yes                    No          |
+\-------------------------------------------/
+Select: Yes
+```
+Note that even if Secure Boot is disabled, you still need to customize the TLS
+keys in UEFI settings, and add the ISRG X1 certificate to make HTTPS download
+work.

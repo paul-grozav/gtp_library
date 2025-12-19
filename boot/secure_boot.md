@@ -559,3 +559,14 @@ UEFI settings -> Advanced -> MAC:AABBCCDDEEFF-IPv4 Network Configuration
 Configured              [Enabled]
 Enable DHCP             [Enabled]
 ```
+You should get to:
+```txt
+>>Start HTTP Boot over IPv4 on MAC: AA-BB-CC-DD-EE-FF....
+  Station IP address is 192.168.0.3
+ 
+  URI: https://boot.server.paul.grozav.info:443/bin/linux/aleph/uki.efi
+  File Size: 52873296 Bytes
+  Downloading...100%
+
+Hello from your kernel ...
+```

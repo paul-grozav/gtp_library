@@ -9,6 +9,7 @@ You can also apply:
 https://github.com/rook/rook/blob/master/deploy/examples/toolbox.yaml
 which will help with running the `ceph` CLI manager.
 
+## Technical setup
 Then create a `CephCluster` object based on their [example](
   https://github.com/rook/rook/blob/release-1.18/deploy/examples/cluster.yaml).
 Note that you may want to change the `.spec.storage.nodes[]` and add your nodes
@@ -18,6 +19,19 @@ with the disks they contribute. A node entry would be similar to:
   devices:
   - name: /dev/disk/by-id/ata-WDC_WD30EFRX-68EUZN0_WD-WCC4NPUZ4ZFR
 ```
+Then you will need to create a pool, before you can actually make a PV.
+```yaml
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: replica-pool
+spec:
+  # This ensures data is spread across different nodes
+  failureDomain: host
+  replicated:
+    size: 3
+```
+You will see that this `Pool` object, creates more PGs.
 ## Terminology
 
 #### OSD
@@ -30,6 +44,13 @@ Once the drives are prepared, you can invoke a new OSD-prepare job/pod by:
 ```sh
 kubectl -n ceph rollout restart deployment rook-ceph-operator
 ```
+
+#### PG
+The PG ( Placement Group ) is a logical sharding mechanism used to group
+thousands (or millions) of objects together for easier management.
+
+#### Pool
+
 
 ## CLI
 ```sh

@@ -42,7 +42,7 @@ $ kubectl -n ceph exec deploy/rook-ceph-tools -- ceph status
 ```
 Going further I'll focus on the `ceph` command itself, skipping the kubectl
 prefix. Or you can just run them in this interactive session:
-`kubectl -n rook--devops--it exec -it deploy/rook-ceph-tools -- bash`
+`kubectl -n ceph exec -it deploy/rook-ceph-tools -- bash`
 
 ```sh
 $ ceph osd out 0

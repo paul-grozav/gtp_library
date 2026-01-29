@@ -9,6 +9,15 @@ You can also apply:
 https://github.com/rook/rook/blob/master/deploy/examples/toolbox.yaml
 which will help with running the `ceph` CLI manager.
 
+Then create a `CephCluster` object based on their [example](
+  https://github.com/rook/rook/blob/release-1.18/deploy/examples/cluster.yaml).
+Note that you may want to change the `.spec.storage.nodes[]` and add your nodes
+with the disks they contribute. A node entry would be similar to:
+```yaml
+- name: oc1
+  devices:
+  - name: /dev/disk/by-id/ata-WDC_WD30EFRX-68EUZN0_WD-WCC4NPUZ4ZFR
+```
 ## Terminology
 
 #### OSD

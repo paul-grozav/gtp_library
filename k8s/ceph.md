@@ -30,6 +30,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
   name: replica-pool
+  namespace: ceph
 spec:
   # This ensures data is spread across different nodes
   failureDomain: host
@@ -38,37 +39,93 @@ spec:
 ```
 You will see that this `Pool` object, creates more PGs.
 
-Next you will need to create a `StorageClass`, before you can actually make
-`PersistentVolumeClaim`s.
+Next you will need to create an SC (`StorageClass`), before you can actually
+make PVCs.
 
 ```yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: rook-ceph-block
+  name: rook-ceph-block
+  namespace: ceph
 # Note that the namespace where rook-ceph was installed is the prefix in the
 # next provisioner
 provisioner: ceph.rbd.csi.ceph.com
 parameters:
-  clusterID: rook-ceph # Namespace where your cluster is
-  pool: replicapool    # Must match the pool name above
+  # ClusterID must match the namespace name where your CephCluster is defined
+  clusterID: ceph
+  # Must match the pool name above
+  pool: replica-pool
   imageFormat: "2"
   imageFeatures: layering
 
   # These secrets are created by the Rook operator automatically
+  # The following namespaces must match the namespace name where your
+  # CephCluster is defined
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
-  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/provisioner-secret-namespace: ceph
   csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
-  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-namespace: ceph
   csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
-  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-namespace: ceph
 
 reclaimPolicy: Delete
 allowVolumeExpansion: true
 ```
 
-Now you can create the `PersistentVolumeClaim`s:
+Now you can create the PVC (`PersistentVolumeClaim`):
 ```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ceph-sample-pvc
+  namespace: ceph
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+```
+
+If your controller plugin pods are fine, you should now see the PV
+(`PersistentVolume`) created by the provisioner, based on your PVC.
+
+You can even mount the PV into a pod like:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ceph-pod
+  namespace: ceph
+spec:
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: ceph-sample-pvc
+  containers:
+  - name: test
+    image: ghcr.io/linuxcontainers/alpine:latest
+    command:
+    - sleep
+    - infinity
+    volumeMounts:
+    - name: data
+      mountPath: /mnt
+```
+Then if you exec into the pod you can see the PV as `/dev/rbd0`:
+```sh
+/ # df -h /mnt
+Filesystem                Size      Used Available Use% Mounted on
+/dev/rbd0                 4.8G     24.0K      4.8G   0% /mnt
+/ # cd /mnt
+/mnt # ls -la
+total 28
+drwxr-xr-x    3 root     root          4096 Jan 29 10:09 .
+drwxr-xr-x    1 root     root          4096 Jan 29 10:14 ..
+drwx------    2 root     root         16384 Jan 29 10:09 lost+found
+/mnt #
 ```
 
 ## Terminology
@@ -84,11 +141,49 @@ Once the drives are prepared, you can invoke a new OSD-prepare job/pod by:
 kubectl -n ceph rollout restart deployment rook-ceph-operator
 ```
 
-#### PG
-The PG ( Placement Group ) is a logical sharding mechanism used to group
-thousands (or millions) of objects together for easier management.
+#### Pool, PG and Object
+A `Pool` in Ceph is a logical partition for storing objects. If you think of
+Ceph as a giant hard drive, a pool is like a partition on that drive. The Ceph
+administrator creates, names, and manages pools.
 
-#### Pool
+The `PG` ( `Placement Group` ) is a logical sharding mechanism used to group
+thousands (or millions) of objects together for easier management. The PG is a
+subset (a part) of the Pool. The PG handles "where" the data goes, on the
+physical disks. Ceph subdivides every pool into a specific number of PGs (e.g.,
+32, 64, or 128) and names and manages them automatically.
+
+The `Object` is the data, the actual file you store. Every object belongs to
+exactly one PG, and every PG belongs to exactly one Pool.
+
+Analogies:
+1. While you could say that the Objects are like files, PGs like folders and
+pools like partitions, that would be fair for Objects and Pools, but PGs are not
+exactly like folders.
+2. A pool is more like a Warehouse that defines security and temperature for
+the boxes being stored. And a PG is more like a Shipping Pallet, that groups
+boxes together for moving.
+
+If you look at your PG IDs (like 1.0 or 1.a4), the number before the dot is the
+Pool ID.
+- PG `1.0` is Placement Group #`0` inside Pool #`1`.
+- PG `2.15` is Placement Group #`15` inside Pool #`2`.
+
+The Lifecycle: From Object to Disk
+```txt
+File/Object: You upload cat.jpg.
+
+Pool: You put it in the photos pool (which is set to size 3).
+
+PG: Ceph hashes the name cat.jpg and places it into PG 1.a4.
+
+OSD: Because the photos pool has a CRUSH rule to replicate data 3 times, PG 1.a4 is sent to 3 different physical disks (OSDs).
+```
+
+#### Controller Plugin
+The `Controller Plugin` is a "provisioner", it is the brain that talks to K8s
+API to create the volumes). You can see these pods by filtering for
+`ctrlplugin`, one such example being:
+`ceph.cephfs.csi.ceph.com-ctrlplugin-84b9cffc86rf6jv`.
 
 
 ## CLI

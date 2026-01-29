@@ -19,7 +19,12 @@ with the disks they contribute. A node entry would be similar to:
   devices:
   - name: /dev/disk/by-id/ata-WDC_WD30EFRX-68EUZN0_WD-WCC4NPUZ4ZFR
 ```
-Then you will need to create a pool, before you can actually make a PV.
+Unlike Longhorn for example, you will see that rook-ceph is not creating a
+`StorageClass` by default, you have to do more of the low-level manual work
+yourself.
+
+First you will need to create a `Pool`, before you can actually make a
+`StorageClass`.
 ```yaml
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
@@ -32,6 +37,40 @@ spec:
     size: 3
 ```
 You will see that this `Pool` object, creates more PGs.
+
+Next you will need to create a `StorageClass`, before you can actually make
+`PersistentVolumeClaim`s.
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: rook-ceph-block
+# Note that the namespace where rook-ceph was installed is the prefix in the
+# next provisioner
+provisioner: ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph # Namespace where your cluster is
+  pool: replicapool    # Must match the pool name above
+  imageFormat: "2"
+  imageFeatures: layering
+
+  # These secrets are created by the Rook operator automatically
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+```
+
+Now you can create the `PersistentVolumeClaim`s:
+```yaml
+```
+
 ## Terminology
 
 #### OSD

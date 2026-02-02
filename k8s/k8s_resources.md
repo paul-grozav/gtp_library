@@ -174,28 +174,17 @@ Or simpler:
 | Container Logs              | /var/log/pods/...           | nodefs                      |
 | emptyDir Volumes            | /var/lib/kubelet/...        | nodefs                      |
 
+There are 2 types of storage `nodefs` and `imagefs` as described below.
 
-### 1. nodefs
-Kubelet defines nodefs as the filesystem that backs:
+It is a good practice to keep  the kubelet and the CR (Container Runtime)
+directories on different filesystems / partitions. However for simplicity in the
+past multiple cloud providers placed them on the same partition.
 
-1. Kubelet root directory.
-  This kubelet parameter defaults to: `--root-dir /var/lib/kubelet`
-2. Container runtime root directory.
-  Sample default values, for some of the popular container runtimes:
-  - containerd: `/var/lib/containerd`
-  - Docker: `/var/lib/docker`
 
-It is a good practice to keep both the kubelet and CR (Container Runtime)
-directories on the same filesystem. So that it detects if they fill and so that
-the eviction can help clean them up.
+### 1. nodefs - Kubelet dir
 
-Whichever filesystem these live on is reported as `nodefs` in eviction signals.
+This kubelet parameter defaults to: `--root-dir /var/lib/kubelet`
 
-However, not recommended, if the 2 dirs live on 2 different parititions, only
-the kubelet dir will be counted as nodefs. Allowing the scenario where a K8s
-cluster is healthy even though the CR partition is full.
-
-#### 1.1. Kubelet dir
 The Kubelet directory contains:
 1. The emptyDir volumes - Stored in `/var/lib/kubelet/pods/{uid}/volumes/`, can
   be limited with `ephemeral-storage` limit on the pod, otherwise it can write
@@ -203,7 +192,7 @@ The Kubelet directory contains:
 1. Container Logs (stdout / stderr)
 1. Projected Volumes (Secrets, ConfigMaps, Downward API)
 
-##### 1.1.1. Container logs directory
+##### 1.1. Container logs directory
 You configure this in the Kubelet Configuration file (usually
 `/var/lib/kubelet/config.yaml` or passed as flags):
 | Parameter | Recommended Value | Description |
@@ -222,7 +211,7 @@ will generate massive JSON log files.
 The Result: If these logs aren't rotated quickly enough, they will trigger a
 DiskPressure eviction.
 
-##### 1.1.2. Projected volumes
+##### 1.2. Projected volumes
 Every time a pod mounts a Secret or a ConfigMap, the Kubelet creates a local
 file to represent that data.
 
@@ -233,7 +222,7 @@ The Impact: While 1MB isn't much, 1,000 pods means 1GB of metadata storage just
 for configuration files.
 
 
-##### 1.1.3 The `resources.limits.ephemeral-storage`
+##### 1.3 The `resources.limits.ephemeral-storage`
 Imagine a container with:
 ```yaml
 resources:
@@ -244,7 +233,8 @@ The Kubelet periodically scans the stdout/stderr log directory. If the sum of
 (Logs + emptyDir + Writable Layer) exceeds 1Gi, the Kubelet will evict (kill)
 the pod.
 
-#### 1.2. CR dir
+
+### 2. imagefs - Container Runtime dir
 The Container Runtime directory contains:
 1. Image layers
 1. Container writable layers (snapshots) - like the `/` in containers
@@ -253,9 +243,9 @@ The Container Runtime directory contains:
 1. Content blobs
 1. GC state
 
-
-### 2. imagefs
-WIP
+Sample default values, for some of the popular container runtimes:
+- containerd: `/var/lib/containerd`
+- Docker: `/var/lib/docker`
 
 ### 3. Q/A
 1. Q: Installing packages in the `/` "OS" inside a container counts as what type

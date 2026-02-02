@@ -139,6 +139,33 @@ cpu usage is "too high".
 
 # Disk space
 ## Types of disk storage
+
+```txt
+/ (Total Disk Capacity)
+│
+├── [nodefs] - Managed by Kubelet
+│   ├── /var/lib/kubelet
+│   │   ├── pods/
+│   │   │   └── {pod-uid}/
+│   │   │       ├── volumes/
+│   │   │       │   ├── kubernetes.io~empty-dir/  <-- [Ephemeral Storage]
+│   │   │       │   ├── kubernetes.io~secret/     <-- (Projected RAM-disk)
+│   │   │       │   └── kubernetes.io~configmap/
+│   │   │       └── etc-hosts
+│   │   ├── device-plugins/ (Sockets for GPUs, etc.)
+│   │   └── plugins_registry/ (CSI Driver sockets)
+│   └── /var/log/pods/ (Container stdout/stderr logs) <-- [Ephemeral Storage]
+│
+├── [imagefs] - Managed by Container Runtime (Containerd)
+│   ├── /var/lib/containerd (or /var/lib/docker)
+│   │   ├── io.containerd.content.v1/ (The raw "blobs" of images)
+│   │   ├── io.containerd.snapshotter.v1/ (Unpacked layers)
+│   │   └── overlays/ (The "Writable Layer" of the container) <-- [Ephemeral Storage]
+│
+└── [Persistent Storage] - Managed by CSI
+    └── /mnt/disks/external-ssd/ (Mounted into pod via PersistentVolume)
+```
+
 ### 1. nodefs
 Kubelet defines nodefs as the filesystem that backs:
 

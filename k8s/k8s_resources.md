@@ -195,11 +195,18 @@ The Kubelet directory contains:
 ##### 1.1. Container logs directory
 You configure this in the Kubelet Configuration file (usually
 `/var/lib/kubelet/config.yaml` or passed as flags):
-| Parameter | Recommended Value | Description |
-| --------- | ----------------- | ----------- |
-| containerLogMaxSize | 10Mi | When a log file hits 10MB, it is "rotated" (closed and a new one started). |
-| containerLogMaxFiles | 3 | Keep only the 3 most recent 10MB files. The oldest is deleted. |
-Total Max Logs **per container**: $10\text{Mi} \times 3 = 30\text{Mi}$.
+```yaml
+- parameter: containerLogMaxSize
+  recommended_value: 10Mi
+  description: |-
+    When a log file hits 10MB, it is "rotated" (closed and a new one started).
+
+- parameter: containerLogMaxFiles
+  recommended_value: 3
+  description: Keep only the 3 most recent 10MB files. The oldest is deleted.
+```
+Resulting in a total Max Logs **per container**:
+$10\text{Mi} \times 3 = 30\text{Mi}$.
 
 The Path: By default, Kubernetes stores container logs in `/var/log/pods`.
 However, on many systems, `/var/log` is part of the root partition, or

@@ -1,5 +1,8 @@
 # Resources in K8s
 
+Read more here:
+1. https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources
+
 ## RAM
 ### RAM formula
 ```txt
@@ -60,9 +63,10 @@ because it still sees 2 GiB of free RAM (the 1 GiB allocated for eviction and
 the 1 GiB of unsed system-reserved RAM).
 
 #### RAM eviction
-When eviction kicks in for the RAM resource, the "punishment" is "hard",
-killing the pods/processes. Unlike the CPU resource for example, for which the
-punishment is "soft", just throttling the performance of those processes.
+When the Kubelet starts evicting for the RAM resource, the "punishment" is
+"hard", killing the pods/processes. Unlike the CPU resource for example, for
+which the punishment is "soft", just throttling the performance of those
+processes.
 
 ## CPU (logical)
 CPU works just like RAM, with some exceptions.
@@ -116,12 +120,118 @@ and have Kube system processes that uses 1 CPU core, and still be good.
 
 If your OS only uses 1 out of the 2 reserved CPU cores, and your K8s pods needs
 more CPU, they are allowed to borrow the free CPU from the system, however, when
-the system processes need it, the OS will have a higher priority. throttling the
-pod's CPU usage.
+the system processes need it, the OS will have a higher priority, throttling the
+pod's CPU usage. In other words, if all processes on the node consume as much
+CPU as they can, pods together cannot consume more than 8 CPUs.
 
 #### CPU has no eviction
 When eviction kicks in for the RAM resource, the "punishment" is "hard",
 killing the pods/processes. However the CPU is a "compressible" resource. So the
 punishment is "soft", just throttling the performance of those processes that
-compete for the resources.
+compete for the resources. In fact Kubelet will not even start evicting if the
+cpu usage is "too high".
+
+
+
+
+
+
+
+# Disk space
+## Types of disk storage
+### 1. nodefs
+Kubelet defines nodefs as the filesystem that backs:
+
+1. Kubelet root directory.
+  This kubelet parameter defaults to: `--root-dir /var/lib/kubelet`
+2. Container runtime root directory.
+  Sample default values, for some of the popular container runtimes:
+  - containerd: `/var/lib/containerd`
+  - Docker: `/var/lib/docker`
+
+It is a good practice to keep both the kubelet and CR (Container Runtime)
+directories on the same filesystem. So that it detects if they fill and so that
+the eviction can help clean them up.
+
+Whichever filesystem these live on is reported as `nodefs` in eviction signals.
+
+However, not recommended, if the 2 dirs live on 2 different parititions, only
+the kubelet dir will be counted as nodefs. Allowing the scenario where a K8s
+cluster is healthy even though the CR partition is full.
+
+#### 1.1. Kubelet dir
+The Kubelet directory contains:
+1. The emptyDir volumes - Stored in `/var/lib/kubelet/pods/{uid}/volumes/`, can
+  be limited with `ephemeral-storage` limit on the pod, otherwise it can write
+  until the partition hits 0% free space.
+1. Container Logs (stdout / stderr)
+1. Projected Volumes (Secrets, ConfigMaps, Downward API)
+
+##### 1.1.1. Container logs directory
+You configure this in the Kubelet Configuration file (usually
+`/var/lib/kubelet/config.yaml` or passed as flags):
+| Parameter | Recommended Value | Description |
+| --------- | ----------------- | ----------- |
+| containerLogMaxSize | 10Mi | When a log file hits 10MB, it is "rotated" (closed and a new one started). |
+| containerLogMaxFiles | 3 | Keep only the 3 most recent 10MB files. The oldest is deleted. |
+Total Max Logs **per container**: $10\text{Mi} \times 3 = 30\text{Mi}$.
+
+The Path: By default, Kubernetes stores container logs in `/var/log/pods`.
+However, on many systems, `/var/log` is part of the root partition, or
+`/var/log/pods` is symlinked into `/var/lib/kubelet`.
+
+The Action: A pod running a loop like `while true; do echo "FILL DISK"; done`
+will generate massive JSON log files.
+
+The Result: If these logs aren't rotated quickly enough, they will trigger a
+DiskPressure eviction.
+
+##### 1.1.2. Projected volumes
+Every time a pod mounts a Secret or a ConfigMap, the Kubelet creates a local
+file to represent that data.
+
+The Action: If a user creates thousands of pods, each mounting a massive 1MB
+ConfigMap.
+
+The Impact: While 1MB isn't much, 1,000 pods means 1GB of metadata storage just
+for configuration files.
+
+
+##### 1.1.3 The `resources.limits.ephemeral-storage`
+Imagine a container with:
+```yaml
+resources:
+  limits:
+    ephemeral-storage: "1Gi"
+```
+The Kubelet periodically scans the stdout/stderr log directory. If the sum of
+(Logs + emptyDir + Writable Layer) exceeds 1Gi, the Kubelet will evict (kill)
+the pod.
+
+#### 1.2. CR dir
+The Container Runtime directory contains:
+1. Image layers
+1. Container writable layers (snapshots) - like the `/` in containers
+1. Runtime metadata
+1. Sandboxes (pause containers)
+1. Content blobs
+1. GC state
+
+
+### Q/A
+1. Q: Installing packages in the `/` "OS" inside a container counts as what type
+of storage?
+
+A: Those bytes go into the `container writable layer`, which lives in the
+Container Runtime directory. For containerd it would be in:
+`/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/`.
+
+2. Q: Bytes in empty-dir-volumes count as what type of storage?
+
+A: These bytes are counted as `ephemeral-storage` and go into the Kubelet
+directory, in:
+`/var/lib/kubelet/pods/{pod_uid}/volumes/kubernetes.io~empty-dir/`. Except if
+your emptyDir volume is defined with a `medium: Memory`, then it doesn't touch
+the disk at all (it's stored in RAM).
+
 

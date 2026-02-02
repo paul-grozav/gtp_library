@@ -218,7 +218,10 @@ The Container Runtime directory contains:
 1. GC state
 
 
-### Q/A
+### 2. imagefs
+WIP
+
+### 3. Q/A
 1. Q: Installing packages in the `/` "OS" inside a container counts as what type
 of storage?
 

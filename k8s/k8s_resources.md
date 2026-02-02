@@ -166,6 +166,15 @@ cpu usage is "too high".
     └── /mnt/disks/external-ssd/ (Mounted into pod via PersistentVolume)
 ```
 
+Or simpler:
+| Content                     | Where it lives              | Which "FS" is it billed to? |
+|-----------------------------|-----------------------------|-----------------------------|
+| Image Layers                | /var/lib/containerd/...     | imagefs                     |
+| Container Writable Layer    | /var/lib/containerd/...     | imagefs                     |
+| Container Logs              | /var/log/pods/...           | nodefs                      |
+| emptyDir Volumes            | /var/lib/kubelet/...        | nodefs                      |
+
+
 ### 1. nodefs
 Kubelet defines nodefs as the filesystem that backs:
 

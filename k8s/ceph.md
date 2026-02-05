@@ -1,9 +1,11 @@
-Using the Rook Ceph operator https://rook.io/docs/rook/latest-release/Helm-Charts/operator-chart/
+Using the Rook Ceph operator
+https://rook.io/docs/rook/latest-release/Helm-Charts/operator-chart/
 ```yaml
 repoURL: https://charts.rook.io/release
 chart: rook-ceph
 ```
-But see Ceph documentation as well: https://docs.ceph.com/en/latest/man/8/ceph-osd/
+But see Ceph documentation as well:
+https://docs.ceph.com/en/latest/man/8/ceph-osd/
 
 You can also apply:
 https://github.com/rook/rook/blob/master/deploy/examples/toolbox.yaml
@@ -131,7 +133,8 @@ drwx------    2 root     root         16384 Jan 29 10:09 lost+found
 ## Terminology
 
 #### OSD
-The OSD ( Object Storage Daemon ) manages data on local storage with redundancy and provides access to that data over the network.
+The OSD ( Object Storage Daemon ) manages data on local storage with redundancy
+and provides access to that data over the network.
 
 Preparing the disks for Ceph. The osd-prepare job/pod will need the disk to have
 no partition and no filesystem on it: `sudo wipefs --all /dev/disk/by-id/XYZ`.
@@ -176,7 +179,8 @@ Pool: You put it in the photos pool (which is set to size 3).
 
 PG: Ceph hashes the name cat.jpg and places it into PG 1.a4.
 
-OSD: Because the photos pool has a CRUSH rule to replicate data 3 times, PG 1.a4 is sent to 3 different physical disks (OSDs).
+OSD: Because the photos pool has a CRUSH rule to replicate data 3 times, PG 1.a4
+is sent to 3 different physical disks (OSDs).
 ```
 
 #### Controller Plugin

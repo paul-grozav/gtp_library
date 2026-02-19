@@ -20,6 +20,9 @@ helm repo update grafana
 
 # Show helm chart versions available in the repo 
 helm search repo grafana/grafana --versions
+
+# Show values.yaml file from chart
+helm show values argo/argo-cd
 ```
 
 # Helmfile

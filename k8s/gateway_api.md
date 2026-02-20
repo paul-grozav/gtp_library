@@ -76,3 +76,15 @@ data-plane.
 You typically only need one `Gateway` to expose all web applications inside the
 cluster. It acts as the entry-point proxy(nginx acts as a web proxy in that
 deployment) for all your apps.
+
+Then that proxy server will route requests to various destinations inside the
+K8s cluster. These destinations are usually service objects that balance/expose
+server pods behind them.
+
+To configure the destinations, the API provides the `HTTPRoute` (amongst others)
+which the controller picks up and will use to know how to configure the proxy to
+handle/redirect requests.
+
+Besides these API objects that configure the proxy/gateway, each API
+implementation can also provide other objects(part of their own API) that allow
+you to configure even other "non-standard" aspects of the proxy.

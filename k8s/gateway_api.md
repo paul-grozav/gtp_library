@@ -225,6 +225,49 @@ spec:
       port: 8096
       # weight: 1
 # ============================================================================ #
+# ---
+# # Enable this if some of your resources like the Secret certificate the
+# # Gateway needs, is in a different namespace. This will grant the GW access to
+# # read the certificate from the application's NS. This ReferenceGrant needs to
+# # be in the application's NS.
+# apiVersion: gateway.networking.k8s.io/v1beta1
+# kind: ReferenceGrant
+# metadata:
+#   name: app1-allow-gateway-to-certs
+#   namespace: app1 # The namespace where the Secret/Service lives
+# spec:
+#   from:
+#   - group: gateway.networking.k8s.io
+#     kind: Gateway
+#     namespace: external-web-gateway
+#   # - group: gateway.networking.k8s.io
+#   #   kind: HTTPRoute
+#   #   namespace: external-web-gateway
+#   to:
+#   - group: ""
+#     kind: Secret
+#   # - group: ""
+#   #   kind: Service
+# ============================================================================ #
+# ---
+# # Enable this if you application only speaks TLS - so the proxy speaks TLS
+# # with it.
+# apiVersion: gateway.networking.k8s.io/v1
+# kind: BackendTLSPolicy
+# metadata:
+#   name: app1-tls-policy
+#   namespace: app1 # Same NS as the service it targets
+# spec:
+#   targetRefs:
+#   - group: ""
+#     kind: Service
+#     name: app1-server
+#   validation:
+#     # The name on the cert
+#     hostname: app1.k8s.server.paul.grozav.info
+#     # Tells NGINX to use standard Root CAs from the Operating System
+#     wellKnownCACertificates: System
+# ============================================================================ #
 ```
 
 Note you want different Gateway listeners for different applications/domains if

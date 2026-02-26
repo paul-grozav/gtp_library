@@ -201,8 +201,10 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
+  # You can use one listener with a wildcard certificate to handle multiple
+  # domains - you don't need a listener for each application. Just an HTTPRoute
+  # for each application.
 # ============================================================================ #
-# will be covered by helm chart after version 2.7.0
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -222,7 +224,7 @@ spec:
   - backendRefs:
     - name: app1-svc # the service name
       port: 80
-      # namespace: app # using another namespace will require a policy
+      # namespace: app # using another namespace will require a grant
       # weight: 1
 # ============================================================================ #
 # ---

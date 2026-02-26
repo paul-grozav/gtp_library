@@ -220,9 +220,9 @@ spec:
     sectionName: app1-https # This is the app-specific listener
   rules:
   - backendRefs:
-    - namespace: jellyfin
-      name: jellyfin # the service name
-      port: 8096
+    - name: app1-svc # the service name
+      port: 80
+      # namespace: app # using another namespace will require a policy
       # weight: 1
 # ============================================================================ #
 # ---

@@ -21,4 +21,17 @@ db.getCollection('myCollection').find({"create_time": { $gt: ISODate("2025-07-14
 # First and last object in a collection
 db.getCollection("myCollection").find().sort({ _id: 1 }).limit(1)
 db.getCollection("myCollection").find().sort({ _id: -1 }).limit(1)
+
+# Creating authentication users
+use admin;
+db.createUser({
+  user: "tedi",
+  pwd: "ABCDEFG_THIS_IS_THE_PLAIN_TEXT_paSsw0rD",
+  roles: [
+    { role: "readWrite", db: "MyWebDatabase" }
+  ]
+});
+db.getUsers();
+db.auth("tedi", "ABCDEFG_THIS_IS_THE_PLAIN_TEXT_paSsw0rD");
+show dbs;
 ```

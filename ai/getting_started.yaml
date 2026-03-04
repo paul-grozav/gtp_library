@@ -1,0 +1,279 @@
+# ============================================================================ #
+# Authors:
+# - Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+# https://github.com/otwld/ollama-helm/blob/main/values.yaml
+#
+# In the world of local LLMs, RAM determines IF the model can run (and how much
+# context it can hold), but CPU determines how fast it can process tokens.
+# ============================================================================ #
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ai--ollama
+  namespace: ai
+spec:
+  project: default
+  destination:
+    namespace: ollama--ai
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://helm.otwld.com/
+    chart: ollama
+    targetRevision: "*"
+    helm:
+      valuesObject:
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: 4
+        extraEnv:
+        # Match limits.cpu
+        - name: OLLAMA_NUM_THREADS
+          value: "2"
+        # Limits the OpenMP math library
+        - name: OMP_NUM_THREADS
+          value: "2"
+        # Forces the stable CPU path
+        - name: OLLAMA_LLM_LIBRARY
+          value: "cpu"
+        # On many Kubernetes CPU nodes, "Flash Attention" actually causes a
+        # performance penalty or a hang.
+        - name: OLLAMA_FLASH_ATTENTION
+          value: "0"
+        ollama:
+          models:
+            pull:
+            # https://ollama.com/library/qwen2.5-coder:1.5b
+            # curl http://ai--ollama.ollama--ai.svc.cluster.local:11434/api/chat -d '{
+            #   "model": "qwen2.5-coder:1.5b",
+            #   "messages": [{"role": "user", "content": "Hello!"}]
+            # }'
+            - qwen2.5-coder:1.5b
+            # model too small to handle 16000 contextwindow required by openClaw
+            # - llama3.2:1b
+            # Good "daily driver" for agents
+            # - "llama3.3:8b"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+# ============================================================================ #
+
+
+
+
+
+
+
+
+
+# Setup OpenClaw to work with the ollama backend
+# ============================================================================ #
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ai--openclaw
+  namespace: ai
+spec:
+  project: default
+  destination:
+    namespace: openclaw--ai
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://serhanekicii.github.io/openclaw-helm
+    chart: openclaw
+    targetRevision: "*"
+    helm:
+      valuesObject:
+        # Override the baked-in openclaw.json to use Ollama as the model
+        # provider
+        app-template:
+          configMode: overwrite
+          configMaps:
+            config:
+              data:
+                undici-timeout-preload.cjs: |
+                  const undici = require("undici");
+                  const { EnvHttpProxyAgent } = undici;
+
+                  const OPTS = {
+                    headersTimeout: 30 * 60 * 1000, // 30 minutes
+                    bodyTimeout: 0,                 // Disable body timeout
+                  };
+
+                  const realSet = undici.setGlobalDispatcher.bind(undici);
+
+                  function enforce() {
+                    realSet(new EnvHttpProxyAgent(OPTS));
+                  }
+
+                  enforce();
+
+                  // Prevent other libs from resetting it
+                  undici.setGlobalDispatcher = function () {
+                    enforce();
+                  };
+                openclaw.json: |
+                  {
+                    "gateway": {
+                      "port": 18789,
+                      "mode": "local",
+                      "trustedProxies": ["10.0.0.1"],
+                      "auth": {
+                        "token": "${OPENCLAW_GATEWAY_TOKEN}"
+                      },
+                      "controlUi": {
+                        "dangerouslyAllowHostHeaderOriginFallback": true
+                      }
+                    },
+                    "browser": {
+                      "enabled": false
+                    },
+                    "agents": {
+                      "defaults": {
+                        "workspace": "/home/node/.openclaw/workspace",
+                        "model": {
+                          "primary": "ollama/qwen2.5-coder:1.5b"
+                        },
+                        "bootstrapMaxChars": 1000,
+                        "bootstrapTotalMaxChars": 5000, 
+                        "elevatedDefault": "off",
+                        "userTimezone": "UTC",
+                        "timeoutSeconds": 1800,
+                        "maxConcurrent": 1
+                      },
+                      "list": [
+                        {
+                          "id": "main",
+                          "default": true,
+                          "identity": {
+                            "name": "OpenClaw",
+                            "emoji": "🦞"
+                          }
+                        }
+                      ]
+                    },
+                    "models": {
+                      "mode": "merge",
+                      "providers": {
+                        "ollama": {
+                          "baseUrl": "http://ai--ollama.ollama--ai.svc.cluster.local:11434",
+                          "apiKey": "ollama-local",
+                          "api": "ollama",
+                          "injectNumCtxForOpenAICompat": true,
+                          "models": [
+                            {
+                              "id": "qwen2.5-coder:1.5b",
+                              "name": "qwen2.5-coder:1.5b",
+                              "contextWindow": 16000,
+                              "reasoning": false,
+                              "maxTokens": 1024
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "logging": {
+                      "level": "info",
+                      "consoleLevel": "info",
+                      "consoleStyle": "compact",
+                      "redactSensitive": "tools"
+                    },
+                    "tools": {
+                      "profile": "full",
+                      "web": {
+                        "search": {
+                          "enabled": false
+                        },
+                        "fetch": {
+                          "enabled": false
+                        }
+                      }
+                    }
+                  }
+          controllers:
+            main:
+              containers:
+                main:
+                  env:
+                    OPENCLAW_GATEWAY_TOKEN: "tedi-openclaw-dev-token"
+                    NODE_OPTIONS: "--require /app/undici-timeout-preload.cjs"
+              initContainers:
+                init-skills:
+                  command:
+                  - sh
+                  - -c
+                  - |
+                    set -x &&
+                    echo "[init-skills] offline mode: skipping ClawHub skill installs" &&
+                    mkdir -p /home/node/.openclaw/workspace &&
+                    ls -la /home/node/.openclaw/workspace &&
+                    # (
+                    #   echo "# SOUL.md" &&
+                    #   echo "You are a DevOps assistant. Be brief." &&
+                    #   echo "IMPORTANT: Always respond in plain text to the user unless using a tool." &&
+                    #   echo "If you understand, simply reply to the user's message." &&
+                    #   true
+                    # ) > /home/node/.openclaw/workspace/SOUL.md &&
+                    # echo "[init-skills] SOUL.md has been initialized." &&
+                    # echo &&
+                    # echo &&
+                    # (
+                    #   echo "# IDENTITY.md - Who Am I?" &&
+                    #   echo "- Name: OpenClaw" &&
+                    #   echo "- Role: DevOps & Automation Specialist" &&
+                    #   echo "- Traits: Technical, concise, tool-oriented." &&
+                    #   echo "- Style: Respond with minimal words; prioritize execution over chat." &&
+                    #   echo "- Order: Check local workspace before asking user." &&
+                    #   true
+                    # ) > /home/node/.openclaw/workspace/IDENTITY.md &&
+                    # echo &&
+                    # echo &&
+                    # echo "# TOOLS.md" > /home/node/.openclaw/workspace/TOOLS.md &&
+                    # > /home/node/.openclaw/workspace/AGENTS.md &&
+                    # > /home/node/.openclaw/workspace/BOOTSTRAP.md &&
+                    # > /home/node/.openclaw/workspace/HEARTBEAT.md &&
+                    # > /home/node/.openclaw/workspace/USER.md &&
+                    # echo &&
+                    # echo &&
+                    # echo ".git/" > /home/node/.openclaw/workspace/.openclawignore &&
+                    # echo ".clawhub/" >> /home/node/.openclaw/workspace/.openclawignore &&
+                    # echo ".openclaw/" >> /home/node/.openclaw/workspace/.openclawignore &&
+                    echo &&
+                    echo &&
+                    true
+          containers:
+            chromium:
+              enabled: false
+          persistence:
+            workspace:
+              enabled: true
+              type: emptyDir
+              # Optional: This puts the workspace in RAM for absolute max speed
+              medium: Memory
+              advancedMounts:
+                main:
+                  main:
+                  - path: /home/node/.openclaw/workspace
+            undici-preload:
+              enabled: true
+              type: configMap
+              identifier: config
+              advancedMounts:
+                main:
+                  main:
+                  - path: /app/undici-timeout-preload.cjs
+                    subPath: undici-timeout-preload.cjs
+                    readOnly: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+# ============================================================================ #

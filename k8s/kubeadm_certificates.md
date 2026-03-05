@@ -127,7 +127,10 @@ The `admin.conf` is the Administrator (full privileges) account used with
 
 You can also use this command:
 ```sh
+# KubeAPI server
 echo | openssl s_client -showcerts -connect 192.168.0.71:6443 -servername api 2>/dev/null | openssl x509 -noout -enddate
+# ETCD server
+openssl s_client -connect 127.0.0.1:2379 -CAfile /etc/kubernetes/pki/etcd/ca.crt 2>/dev/null | openssl x509 -noout -dates
 ```
 To connect to the KubeAPI server (where kubectl connects too), to get the server
 certificate (`apiserver`) and verify it's end date.
@@ -146,7 +149,7 @@ certificates.
 
 
 # To restart apiserver or others, use:
-# sudo CONTAINER_RUNTIME_ENDPOINT=unix:///run/containerd/containerd.sock crictl pods
+# sudo CONTAINER_RUNTIME_ENDPOINT=unix:///run/containerd/containerd.sock crictl pods --namespace kube-system
 # you should see a pod kube-apiserver-master1 in namespace kube-system . You can
 # delete that and kubelet will restart it automatically.
 #
@@ -159,6 +162,18 @@ certificates.
 # can also move all /etc/kubernetes/manifests/*.yaml at once to restart all
 # pods.
 ```
+Note:
+1. That each control-plane node will generate a different certificate, and
+thus a different `admin.conf` kubeconfig file. That is ok, you can pick any one
+and use that on your kubectl/client.
+
+2. The old kubeconfig/certificate might still allow you to authenticate into
+KubeAPI server, because it's still issued by the existing CA, and might still be
+valid for a few more days. But as soon as it expires the KubeAPI server might
+reject it.
+
+3. When you renew the CAs, all kubeconfig files and certificates will have to be
+re-emitted again. Luckily that only happens once every 10 years.
 
 See also:
 1. https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/

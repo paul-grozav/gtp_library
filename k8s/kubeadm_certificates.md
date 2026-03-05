@@ -91,21 +91,38 @@ certificate inside of them (the `client-certificate-data` field). This usually
 gets generated for 1 year, and then can be renewed. Each certificate is signed
 using one of the CA listed above.
 
-Some of these certificate files are stored in `/etc/kubernetes/pki/`.
-| Certificate              | Certificate file                              | Key file                          |
-| ------------------------ | --------------------------------------------- | --------------------------------- |
-| admin.conf               |                                               |                                   |
-| apiserver                | /etc/kubernetes/pki/apiserver.crt             | /etc/kubernetes/pki/apiserver.key |
-| apiserver-etcd-client    | /etc/kubernetes/pki/apiserver-etcd-client.crt |                                   |
-| apiserver-kubelet-client |                                               |                                   |
-| controller-manager.conf  |                                               |                                   |
-| etcd-healthcheck-client  |                                               |                                   |
-| etcd-peer                |                                               |                                   |
-| etcd-server              |                                               |                                   |
-| front-proxy-client       |                                               |                                   |
-| scheduler.conf           |                                               |                                   |
-| super-admin.conf         |                                               |                                   |
-```
+Location for the certificates and CAs:
+
+Certificates
+| Certificate              | Certificate file                                 | Private key file                                 |
+| ------------------------ | ------------------------------------------------ | ------------------------------------------------ |
+| apiserver                | /etc/kubernetes/pki/apiserver.crt                | /etc/kubernetes/pki/apiserver.key                |
+| apiserver-etcd-client    | /etc/kubernetes/pki/apiserver-etcd-client.crt    | /etc/kubernetes/pki/apiserver-etcd-client.key    |
+| apiserver-kubelet-client | /etc/kubernetes/pki/apiserver-kubelet-client.crt | /etc/kubernetes/pki/apiserver-kubelet-client.key |
+| etcd-healthcheck-client  | /etc/kubernetes/pki/etcd/healthcheck-client.crt  | /etc/kubernetes/pki/etcd/healthcheck-client.key  |
+| etcd-peer                | /etc/kubernetes/pki/etcd/peer.crt                | /etc/kubernetes/pki/etcd/peer.key                |
+| etcd-server              | /etc/kubernetes/pki/etcd/server.crt              | /etc/kubernetes/pki/etcd/server.key              |
+| front-proxy-client       | /etc/kubernetes/pki/front-proxy-client.crt       | /etc/kubernetes/pki/front-proxy-client.key       |
+
+
+KubeConfig files with embedded certificates:
+| Certificate              | Configuration file                               |
+| ------------------------ | ------------------------------------------------ |
+| admin.conf               | /etc/kubernetes/admin.conf                       |
+| controller-manager.conf  | /etc/kubernetes/controller-manager.conf          |
+| scheduler.conf           | /etc/kubernetes/scheduler.conf                   |
+| super-admin.conf         | /etc/kubernetes/super-admin.conf                 |
+
+
+Authorities:
+| Certificate authority | Certificate file                       | Private key file                       |
+| --------------------- | -------------------------------------- | -------------------------------------- |
+| ca                    | /etc/kubernetes/pki/ca.crt             | /etc/kubernetes/pki/ca.key             |
+| etcd-ca               | /etc/kubernetes/pki/etcd/ca.crt        | /etc/kubernetes/pki/etcd/ca.key        |
+| front-proxy-ca        | /etc/kubernetes/pki/front-proxy-ca.crt | /etc/kubernetes/pki/front-proxy-ca.key |
+
+The `admin.conf` is the Administrator (full privileges) account used with
+`kubectl` to manage the cluster.
 
 # kubeadm cert renewal
 

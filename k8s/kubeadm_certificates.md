@@ -8,7 +8,7 @@ clusters:
 - name: home-k8s
   cluster:
     certificate-authority-data: SECRET_DATA1
-    server: https://192.168.0.71:8232
+    server: https://192.168.0.71:6443
 users:
 - name: admin
   user:
@@ -21,6 +21,7 @@ contexts:
     user: admin
 current-context: admin@home-k8s
 ```
+
 
 It contains a list of clusters, each one having a name and a pair of CA
 (`certificate-authority-data`) and the KubeAPI server endpoint (`server`) (which
@@ -124,11 +125,39 @@ Authorities:
 The `admin.conf` is the Administrator (full privileges) account used with
 `kubectl` to manage the cluster.
 
+You can also use this command:
+```sh
+echo | openssl s_client -showcerts -connect 192.168.0.71:6443 -servername api 2>/dev/null | openssl x509 -noout -enddate
+```
+To connect to the KubeAPI server (where kubectl connects too), to get the server
+certificate (`apiserver`) and verify it's end date.
+
+
 # kubeadm cert renewal
 
 ```sh
 # kubeadm certs renew apiserver
-# That will renew only the apiserver certificate which usually lives in
+# # That will renew only the apiserver certificate ... or you could do:
+# kubeadm certs renew all
+...
+Done renewing certificates. You must restart the kube-apiserver,
+kube-controller-manager, kube-scheduler and etcd, so that they can use the new
+certificates.
+
+
+# To restart apiserver or others, use:
+# sudo CONTAINER_RUNTIME_ENDPOINT=unix:///run/containerd/containerd.sock crictl pods
+# you should see a pod kube-apiserver-master1 in namespace kube-system . You can
+# delete that and kubelet will restart it automatically.
+#
+# Or simply: mv /etc/kubernetes/manifests/kube-apiserver.yaml /root
+# It usually takes <30 seconds for the kubelet to find that the file is missing
+# and it will stop the apiserver pod. Then moving the manifest file back, will
+# make the kubelet start the apiserver pod again.
+#
+# You could use docker instead of crictl or whatever your runtime is, and you
+# can also move all /etc/kubernetes/manifests/*.yaml at once to restart all
+# pods.
 ```
 
 See also:

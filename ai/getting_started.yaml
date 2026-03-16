@@ -277,3 +277,33 @@ spec:
     - CreateNamespace=true
     - ServerSideApply=true
 # ============================================================================ #
+
+
+
+# Using Google's Gemini
+# ============================================================================ #
+# Go to https://aistudio.google.com/u/1/api-keys and get a key
+
+# Listing models available for your key:
+# $ curl -s "https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_KEY_HERE" | grep "name"
+# "name": "models/gemini-2.5-flash",
+# "name": "models/gemini-2.0-flash",
+# "name": "models/gemini-2.0-flash-001",
+# "name": "models/gemini-2.0-flash-lite-001",
+# "name": "models/gemini-2.0-flash-lite",
+
+# curl query - you can get this from your api-keys as well
+# $ curl "https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=YOUR_KEY_HERE" \
+#   -H 'Content-Type: application/json' -X POST \
+#   -d '{
+#    "contents": [
+#      {
+#        "parts": [
+#          {
+#            "text": "Explain how AI works in a few words"
+#          }
+#        ]
+#      }
+#    ]
+#  }'
+# ============================================================================ #

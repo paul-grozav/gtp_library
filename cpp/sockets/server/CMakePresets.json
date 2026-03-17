@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "debug",
+      "displayName": "Build CMake application",
+      "description": "Use this preset for debug builds",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ]
+}

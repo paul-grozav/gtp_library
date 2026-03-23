@@ -95,7 +95,7 @@ you to configure even other "non-standard" aspects of the proxy.
 # Authors: Tancredi-Paul Grozav <paul@grozav.info>
 # ============================================================================ #
 ---
-# Using ArgoCD to install Gateway API CRDs
+# Using ArgoCD to install the Kubernetes Gateway API CRDs
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -107,6 +107,30 @@ spec:
     repoURL: https://github.com/kubernetes-sigs/gateway-api
     targetRevision: main
     path: config/crd/standard
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gateway-api
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
+# ============================================================================ #
+# Install NGINX GW API CRDs (implementation)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-gateway-fabric-gateway-api
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nginx/nginx-gateway-fabric
+    targetRevision: main
+    path: config/crd/gateway-api/standard
   destination:
     server: https://kubernetes.default.svc
     namespace: gateway-api

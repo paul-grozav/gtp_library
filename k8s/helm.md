@@ -23,6 +23,9 @@ helm search repo grafana/grafana --versions
 
 # Show values.yaml file from chart
 helm show values argo/argo-cd
+
+# Render the template/manifest of a given app version
+helm template redpanda/redpanda --version 26.1.1
 ```
 
 # Helmfile

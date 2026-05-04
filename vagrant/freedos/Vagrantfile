@@ -1,0 +1,31 @@
+# ============================================================================ #
+# Authors:
+# - Tancredi-Paul Grozav <paul@grozav.info>
+# ============================================================================ #
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+# ============================================================================ #
+# https://developer.hashicorp.com/vagrant/docs/vagrantfile/machine_settings
+#
+# https://qemu.weilnetz.de/w64/qemu-w64-setup-20260422.exe
+# ============================================================================ #
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://vagrantcloud.com/search.
+  # Download box file from:
+  # https://portal.cloud.hashicorp.com/vagrant/discover/RobinHood2021/
+  #   FreeDOS-1.3
+  # Then import using: vagrant box add RobinHood2021/FreeDOS-1.3 ./my_box.file
+  config.vm.box = "RobinHood2021/FreeDOS-1.3"
+  config.vm.box_version = "0"
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  config.vm.box_check_update = false
+end
+# ============================================================================ #

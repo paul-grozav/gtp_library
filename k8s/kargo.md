@@ -60,6 +60,8 @@ spec:
 
 </details>
 
+See [API Reference](https://doc.crds.dev/github.com/akuity/kargo).
+
 Then create a project and it's config:
 <details>
 

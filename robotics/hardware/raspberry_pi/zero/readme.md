@@ -22,6 +22,37 @@ major hardware damage. However you can also have daily intensive activities of
 2 - 5 hours, when you keep the CPU at 75°C and that will still keep the hardware
 safe for 5+ years.
 
+# Configuring input
+https://retropie.org.uk/docs/Controller-Configuration/
+```yaml
+keyboard:
+  d_pad_up:
+  d_pad_down:
+  d_pad_left:
+  d_pad_right:
+  start:
+  select:
+  button_a_east:
+  button_b_south:
+  button_x_north:
+  button_y_west:
+  left_shoulder:
+  right_shoulder:
+  left_trigger:
+  right_trigger:
+  left_thumb:
+  right_thumb:
+  left_analog_up:
+  left_analog_down:
+  left_analog_left:
+  left_analog_right:
+  right_analog_up:
+  right_analog_down:
+  right_analog_left:
+  right_analog_right:
+  hot_key_enable:
+```
+
 # Audio config
 Create a `/home/pi/.asoundrc` file containing:
 ```txt

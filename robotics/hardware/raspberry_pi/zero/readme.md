@@ -52,6 +52,7 @@ keyboard:
   right_analog_right:
   hot_key_enable:
 ```
+Press A key to select OK and finish configuration
 
 # Audio config
 Create a `/home/pi/.asoundrc` file containing:

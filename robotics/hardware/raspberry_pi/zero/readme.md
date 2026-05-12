@@ -26,31 +26,31 @@ safe for 5+ years.
 https://retropie.org.uk/docs/Controller-Configuration/
 ```yaml
 keyboard:
-  d_pad_up:
-  d_pad_down:
-  d_pad_left:
-  d_pad_right:
-  start:
-  select:
-  button_a_east:
-  button_b_south:
-  button_x_north:
-  button_y_west:
-  left_shoulder:
-  right_shoulder:
-  left_trigger:
-  right_trigger:
-  left_thumb:
-  right_thumb:
-  left_analog_up:
-  left_analog_down:
-  left_analog_left:
-  left_analog_right:
-  right_analog_up:
-  right_analog_down:
-  right_analog_left:
-  right_analog_right:
-  hot_key_enable:
+  d_pad_up: Up Arrow # Standard Directional
+  d_pad_down: Down Arrow # Standard Directional
+  d_pad_left: Left Arrow # Standard Directional
+  d_pad_right: Right Arrow # Standard Directional
+  start: Enter # Traditional Start
+  select: Right Shift # Close to Enter
+  button_a_east: L # Right-side action
+  button_b_south: K # Primary Accept/Jump
+  button_x_north: I # Top action
+  button_y_west: J # Primary Attack/Run
+  left_shoulder_L1: Q # Left hand index
+  right_shoulder_R1: E # Left hand index
+  left_trigger_L2: 1 # Above Q
+  right_trigger_R2: 3 # Above E
+  left_thumb_L3: Z # Under WASD
+  right_thumb_R3: C # Under WASD
+  left_analog_up: W # Standard FPS Movement
+  left_analog_down: S # Standard FPS Movement
+  left_analog_left: A # Standard FPS Movement
+  left_analog_right: D # Standard FPS Movement
+  right_analog_up: 8_numpad # Camera Control
+  right_analog_down: 2_numpad # Camera Control
+  right_analog_left: 4_numpad # Camera Control
+  right_analog_right: 6_numpad # Camera Control
+  hot_key_enable: Right_Alt # Hard to hit by accident
 ```
 Press the A key to select OK and finish configuration
 

@@ -21,4 +21,11 @@ Keeping it in the optimal zone, should give you 5-10 years of running without
 major hardware damage. However you can also have daily intensive activities of
 2 - 5 hours, when you keep the CPU at 75°C and that will still keep the hardware
 safe for 5+ years.
- 
+
+# Audio config
+Create a `/home/pi/.asoundrc` file containing:
+```txt
+defaults.pcm.!card 1
+defaults.ctl.!card 1
+```
+This should get your USB headsets working.

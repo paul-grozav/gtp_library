@@ -31,4 +31,7 @@ kubectl -n kube-system get configmap coredns -o yaml --show-managed-fields |
   yq -y \
   '.metadata.managedFields[] | select(.manager=="argocd-controller") | .time' |
   yq -r '.'
+
+# Refresh an application
+kubectl -n app-namespace patch applications certman --type merge -p '{"metadata":{"annotations":{"argocd.argoproj.io/refresh":"normal"}}}'
 ```

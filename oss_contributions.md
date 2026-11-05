@@ -18,6 +18,7 @@
 1. https://github.com/akuity/kargo/issues/3200#issuecomment-4370433804
 
 # GitHub discussion
+1. https://github.com/microsoft/WSL/discussions/6007#discussioncomment-19415757
 1. https://github.com/containers/podman/discussions/20665
 
 # Git platforms:

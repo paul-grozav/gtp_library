@@ -1,11 +1,11 @@
 # ============================================================================ #
 # Author: Tancredi-Paul Grozav <paul@grozav.info>
 # ============================================================================ #
-{{- with secret "secret/mariadb/auth/creds/my-injector" -}}
+{{ with secret "secret/mariadb/auth/creds/my-injector" }}
 sql_user='{{ .Data.data.username }}'
 sql_password='{{ .Data.data.password }}'
 sql_host='mariadb-service'
 sql_port='3306'
 sql_db='primary_db'
-{{- end -}}
+{{ end }}
 # ============================================================================ #

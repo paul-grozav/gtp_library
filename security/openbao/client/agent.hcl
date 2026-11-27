@@ -8,8 +8,6 @@ vault {
 auto_auth {
   method "approle" {
     config = {
-      # role_id_file_path = "/openbao/creds/role_id"
-      # secret_id_file_path = "/openbao/creds/secret_id"
       role_id_file_path = "/run/secrets/role_id"
       secret_id_file_path = "/run/secrets/secret_id"
       remove_secret_id_file_after_reading = false
